@@ -3,6 +3,8 @@
 Instant mini-games for the moments you're waiting on Claude Code / Codex.
 Say "开个游戏" / "I'm bored" and **Down 100 Floors** opens in your browser.
 
+[Project intro in 中文 / English / Français / Italiano / العربية](docs/project-intro.md)
+
 - **Thin-shell architecture** — the installed skill is a ~200-line stdlib-only
   launcher. All games, notices, ad switches and pricing live in a remote
   `manifest.json`. Shipping an update = `git push`. Users never reinstall.
