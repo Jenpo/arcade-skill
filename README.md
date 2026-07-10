@@ -35,6 +35,17 @@ More launch copy, screenshots, positioning notes, and gallery assets live in
 - Works offline through a seed bundle and cached verified bundles.
 - Uses original game code and art. No copied third-party source or assets.
 
+## Support / GTM
+
+Arcade Skill monetizes like a developer toy, not a pay-to-win mobile game.
+
+- Tips: GitHub Sponsors stays visible in the repo and appears in-game only on a
+  new personal best.
+- Stripe Pro: reserved for later cosmetic perks, early access, or supporter
+  badges. No paid health, paid revives, or leaderboard advantage.
+- Web ads: AdSense can run on the web surface later; localhost skill sessions
+  stay ad-free unless the manifest explicitly says otherwise.
+
 ## Install
 
 Install the packaged `arcade.skill` from Releases, or copy the `skill/` folder

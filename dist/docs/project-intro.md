@@ -48,6 +48,19 @@ stay skill-pure:
 - No paid health, paid revives, or paid competitive advantage.
 - Score submissions should include version, mode, seed, and compact event data.
 
+## GTM and Monetization
+
+The project should earn money like a geeky developer artifact, not like a
+pay-to-win mobile funnel.
+
+- **Tip jar first:** GitHub Sponsors is the primary early monetization path and
+  appears at the “new best” emotional peak.
+- **Stripe later:** Pro should wait for real WAU signal and stay cosmetic,
+  early-access, or supporter-badge based.
+- **Ads later:** AdSense belongs on the web surface, not localhost skill
+  sessions. The manifest keeps an `ads.enabled` switch ready for rollout.
+- **Fair ranked play:** no paid health, paid revives, or competitive advantage.
+
 ## Suggested Tags
 
 - AI coding break

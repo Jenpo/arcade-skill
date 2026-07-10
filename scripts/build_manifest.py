@@ -17,7 +17,7 @@ BASE_URL = "https://arcade.fxpeek.com"       # owned domain; CNAME → GitHub Pa
 CUSTOM_DOMAIN = "arcade.fxpeek.com"          # written to dist/CNAME for Pages
 VERSIONS = {
     "tower100": {
-        "version": "1.1.1",
+        "version": "1.1.2",
         "src": ROOT / "games/tower100/tower100.html",
         "title": {"zh": "是男人就下100层", "en": "Down 100 Floors"},
         "tier": "free",

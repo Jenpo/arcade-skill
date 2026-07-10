@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "manifest_version": "2026.07.10-2315",
+  "manifest_version": "2026.07.10-2321",
   "min_loader_version": "1.0.0",
   "kill_switch": false,
   "notice": {
@@ -37,10 +37,10 @@
         "zh": "是男人就下100层",
         "en": "Down 100 Floors"
       },
-      "version": "1.1.1",
-      "entry": "https://arcade.fxpeek.com/bundles/tower100-1.1.1.html",
-      "sha256": "de833dcee0f7c382d99f0b56e49f58531dd73d67b9775386fdd6a8558481cd29",
-      "size_kb": 14.6,
+      "version": "1.1.2",
+      "entry": "https://arcade.fxpeek.com/bundles/tower100-1.1.2.html",
+      "sha256": "1712d2388626b7f39e130c49372448be9f995928912026cfc76ffc97ef0723ff",
+      "size_kb": 14.8,
       "tier": "free",
       "min_loader_version": "1.0.0"
     }

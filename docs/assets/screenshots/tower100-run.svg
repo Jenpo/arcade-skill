@@ -15,8 +15,17 @@
   <rect x="336" y="366" width="168" height="22" fill="#a8653c"/><rect x="336" y="366" width="168" height="7" fill="#5fd08a"/>
   <text x="398" y="360" font-family="Menlo,Consolas,monospace" font-size="28" fill="#5fd08a">▰▰</text>
   <rect x="594" y="470" width="150" height="22" fill="#a8653c"/><rect x="594" y="470" width="150" height="7" fill="#e8a33d"/>
-  <rect x="452" y="300" width="48" height="64" fill="#efe6d0"/><rect x="452" y="300" width="48" height="10" fill="#5fd08a"/>
-  <rect x="450" y="364" width="52" height="10" fill="#1a172c"/>
+  <g aria-label="pixel player">
+    <rect x="458" y="290" width="34" height="28" fill="#efe6d0"/>
+    <rect x="454" y="298" width="42" height="8" fill="#5fd08a"/>
+    <rect x="466" y="304" width="6" height="6" fill="#2a2640"/>
+    <rect x="480" y="304" width="6" height="6" fill="#2a2640"/>
+    <rect x="464" y="320" width="26" height="34" fill="#efe6d0"/>
+    <rect x="448" y="328" width="14" height="26" fill="#c9c2b2"/>
+    <rect x="492" y="328" width="14" height="26" fill="#c9c2b2"/>
+    <rect x="462" y="356" width="14" height="10" fill="#c9c2b2"/>
+    <rect x="480" y="356" width="14" height="10" fill="#c9c2b2"/>
+  </g>
   <g font-family="Menlo,Consolas,monospace" font-size="18" fill="#aab2c8">
     <text x="150" y="610">local best saved · no paid power · one more run</text>
   </g>

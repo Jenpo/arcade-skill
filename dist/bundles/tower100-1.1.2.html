@@ -273,10 +273,14 @@ function drawPlat(p){
 function drawPlayer(){
   if(g.inv>0 && (g.t>>2)%2) return;        // damage blink
   const x=g.px,y=g.py;
-  px(x,y+6,g.pw,g.ph-6,C.player);          // body
-  px(x+3,y,g.pw-6,10,C.player);            // head
-  px(x+5,y+3,4,4,"#2a2640"); px(x+g.pw-9,y+3,4,4,"#2a2640"); // eyes
-  px(x,y+g.ph-4,8,4,C.playerD); px(x+g.pw-8,y+g.ph-4,8,4,C.playerD); // feet
+  const lean = input.left ? -1 : input.right ? 1 : 0;
+  const suit = g.inv>0 ? C.danger : C.player;
+  px(x+5+lean,y,14,12,C.player);           // head
+  px(x+4+lean,y+3,16,3,C.spring);          // headband
+  px(x+8+lean,y+5,3,3,"#2a2640"); px(x+15+lean,y+5,3,3,"#2a2640");
+  px(x+6,y+12,12,12,suit);                 // torso
+  px(x+3,y+14,4,9,C.playerD); px(x+17,y+14,4,9,C.playerD); // arms
+  px(x+6,y+24,5,4,C.playerD); px(x+15,y+24,5,4,C.playerD); // feet
 }
 function text(s,x,y,size,c,align){ cx.fillStyle=c; cx.font=`bold ${size}px ui-monospace,Menlo,monospace`;
   cx.textAlign=align||"center"; cx.fillText(s,x,y); }

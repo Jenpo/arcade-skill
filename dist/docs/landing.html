@@ -19,8 +19,14 @@
   .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px}
   .card h2{font-size:18px;margin:0 0 8px}.card p{margin:0;color:var(--muted)}
   .shots{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}.shots img{width:100%;border:1px solid var(--line);border-radius:8px;background:#151329}
+  .gtm{margin-top:32px;background:#111827;color:#eef2ef;border-radius:8px;padding:24px;border:1px solid #252b3a}
+  .gtm h2{font-size:28px;line-height:1.1;margin:0 0 10px}.gtm p{color:#b9c3bd;max-width:760px;margin:0 0 18px}
+  .offers{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.offer{border:1px solid #343b4f;border-radius:8px;padding:18px;background:#171d2b}
+  .offer strong{display:block;margin-bottom:8px;color:#fff}.offer span{display:block;color:#aeb8b4;min-height:74px}
+  .offer a{display:inline-block;margin-top:14px;color:#111827;background:#f4d06f;border-radius:999px;padding:8px 12px;text-decoration:none;font-weight:800}
+  .offer .soon{display:inline-block;margin-top:14px;color:#aeb8b4;border:1px solid #343b4f;border-radius:999px;padding:8px 12px}
   code{background:#ebe5db;border:1px solid #d7cec0;border-radius:5px;padding:2px 5px}
-  @media(max-width:760px){.nav{align-items:flex-start;flex-direction:column}.grid,.shots{grid-template-columns:1fr}h1{font-size:44px}}
+  @media(max-width:760px){.nav{align-items:flex-start;flex-direction:column}.grid,.shots,.offers{grid-template-columns:1fr}h1{font-size:44px}}
 </style>
 <main>
   <nav class="nav">
@@ -55,6 +61,31 @@
   <section class="shots">
     <img src="/docs/assets/screenshots/tower100-menu.svg" alt="Down 100 Floors menu">
     <img src="/docs/assets/screenshots/tower100-run.svg" alt="Down 100 Floors gameplay">
+  </section>
+  <section class="gtm">
+    <h2>Support the tiny arcade cabinet.</h2>
+    <p>Arcade Skill follows the GTM rule: keep ranked play fair, keep the first
+    game free, and monetize through respect instead of frustration.</p>
+    <div class="offers">
+      <article class="offer">
+        <strong>Tip jar</strong>
+        <span>For people who like weird developer toys, hot-update manifests,
+        and old web arcade energy. Tips appear at the “new best” moment.</span>
+        <a href="https://github.com/sponsors/Jenpo">Sponsor on GitHub</a>
+      </article>
+      <article class="offer">
+        <strong>Stripe Pro, later</strong>
+        <span>Reserved for cosmetic perks, early game access, and supporter
+        badges. No paid health, no paid revives, no leaderboard advantage.</span>
+        <span class="soon">Stripe link coming after WAU signal</span>
+      </article>
+      <article class="offer">
+        <strong>Web ads switch</strong>
+        <span>AdSense is for the web landing/play surface, not localhost skill
+        sessions. The manifest already has an ads switch for later rollout.</span>
+        <a href="/manifest.json">Inspect manifest</a>
+      </article>
+    </div>
   </section>
 </main>
 </html>
