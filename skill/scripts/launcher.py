@@ -12,8 +12,8 @@ via the remote manifest, this file should almost never need to change):
 Offline behaviour: falls back to last cached manifest, then to the seed bundle
 shipped inside the skill package. Ads are forced OFF when offline.
 """
-import argparse, base64, hashlib, http.server, json, os, shutil, socket
-import socketserver, subprocess, sys, threading, time, urllib.request, webbrowser
+import argparse, base64, hashlib, hmac, http.server, json, os, shutil, socket
+import socketserver, subprocess, sys, threading, time, urllib.parse, urllib.request, webbrowser
 from pathlib import Path
 
 # ---- the ONLY burned-in values. Use a domain you control forever. ----
@@ -22,11 +22,20 @@ MANIFEST_URLS = [
     "https://arcade.fxpeek.com/manifest.json",               # primary: owned domain
     "https://jenpo.github.io/arcade-skill/manifest.json",
     "https://raw.githubusercontent.com/Jenpo/arcade-skill/main/dist/manifest.json",
+    "https://cdn.jsdelivr.net/gh/Jenpo/arcade-skill@main/dist/manifest.json",
 ]
-LOADER_VERSION = "1.0.0"
+LOADER_VERSION = "1.1.0"
 CACHE = Path(os.environ.get("ARCADE_CACHE_DIR", Path.home() / ".arcade-skill"))
 SKILL_DIR = Path(__file__).resolve().parent.parent          # skill/
 SEED_BUNDLES = SKILL_DIR / "assets"                          # offline fallback
+ALLOWED_BUNDLE_HOSTS = {
+    "arcade.fxpeek.com",
+    "jenpo.github.io",
+    "raw.githubusercontent.com",
+    "cdn.jsdelivr.net",
+}
+MANIFEST_PUBKEY_B64 = os.environ.get("ARCADE_MANIFEST_PUBKEY", "")
+LICENSE_HMAC_KEY = os.environ.get("ARCADE_LICENSE_HMAC_KEY", "").encode()
 
 
 def log(msg): print(f"[arcade] {msg}", flush=True)
@@ -49,12 +58,42 @@ def fetch(url: str, timeout=4) -> bytes:
         return r.read()
 
 
+def validate_entry_url(entry: str) -> str:
+    parsed = urllib.parse.urlparse(entry)
+    host = parsed.hostname or ""
+    if parsed.scheme != "https":
+        raise SystemExit("[arcade] bundle must be https")
+    if host not in ALLOWED_BUNDLE_HOSTS:
+        raise SystemExit(f"[arcade] bundle host '{host}' not in allowlist — refusing download")
+    return entry
+
+
+def verify_manifest_sig(data: bytes, sig_b64: str) -> bool:
+    """Optional Ed25519 manifest signature hook. Disabled until a pubkey is burned in."""
+    if not MANIFEST_PUBKEY_B64:
+        return True
+    try:
+        from nacl.signing import VerifyKey
+        VerifyKey(base64.b64decode(MANIFEST_PUBKEY_B64)).verify(
+            data, base64.b64decode(sig_b64))
+        return True
+    except ImportError:
+        log("WARN: pynacl absent, manifest signature check skipped")
+        return True
+    except Exception:
+        return False
+
+
 def load_manifest() -> dict:
     CACHE.mkdir(parents=True, exist_ok=True)
     cached = CACHE / "manifest.json"
     for url in [u for u in MANIFEST_URLS if u and "REPLACE_ME" not in u]:
         try:
             data = fetch(url)
+            if MANIFEST_PUBKEY_B64:
+                sig = fetch(url + ".sig").decode().strip()
+                if not verify_manifest_sig(data, sig):
+                    raise RuntimeError("bad manifest signature")
             m = json.loads(data)
             cached.write_bytes(data)
             m["_online"] = True
@@ -93,6 +132,7 @@ def ensure_bundle(game: dict, online: bool) -> Path:
     if online:
         tmp = local.with_suffix(".tmp")
         try:
+            validate_entry_url(game["entry"])
             log(f"downloading {name} ...")
             tmp.write_bytes(fetch(game["entry"], timeout=15))
             if sha256_file(tmp) == game["sha256"]:
@@ -115,14 +155,34 @@ def ensure_bundle(game: dict, online: bool) -> Path:
     raise SystemExit(f"[arcade] no playable bundle for {game['id']}")
 
 
+def check_license() -> bool:
+    f = CACHE / "license.jwt"
+    if not f.exists() or not LICENSE_HMAC_KEY:
+        return False
+    try:
+        payload_b64, mac_hex = f.read_text().strip().split(".")
+        payload = base64.b64decode(payload_b64)
+        want = hmac.new(LICENSE_HMAC_KEY, payload, hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(want, mac_hex):
+            return False
+        data = json.loads(payload)
+        return data.get("exp", 0) > time.time()
+    except Exception:
+        return False
+
+
 def build_cfg(manifest: dict, lang: str) -> str:
     mon = manifest.get("monetization", {})
     ads = dict(mon.get("ads", {}))
     if not manifest.get("_online"):
         ads["enabled"] = False
-    licensed = (CACHE / "license.jwt").exists()             # TODO(M3): real signature check
-    cfg = {"lang": lang, "ads": ads, "pro": licensed, "source": "skill",
-           "tips": mon.get("tips", {}), "share": mon.get("share", {})}
+    # AdSense does not fill ads on localhost. Skill sessions use tips/share/pro;
+    # hosted web play is the ad surface.
+    ads["enabled"] = False
+    ads["_reason"] = "adsense_no_fill_on_localhost"
+    cfg = {"lang": lang, "ads": ads, "pro": check_license(), "source": "skill",
+           "tips": mon.get("tips", {}), "share": mon.get("share", {}),
+           "loader": LOADER_VERSION}
     return base64.b64encode(json.dumps(cfg, separators=(",", ":")).encode()).decode()
 
 

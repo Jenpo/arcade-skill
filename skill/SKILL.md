@@ -1,13 +1,11 @@
 ---
 name: arcade
 description: >
-  Launch instant browser mini-games (Down 100 Floors / 是男人就下100层 and more)
-  for the user to play while waiting. Use this skill whenever the user says they
-  are bored, waiting for a long task, wants to play a game, take a break, or
-  mentions 玩游戏 / 无聊 / 摸鱼 / 等任务 / 来一把 / 下100层 / game / bored /
-  "kill time" — even if they don't explicitly ask for an "arcade". Also use it
-  proactively when a long-running background task leaves the user idle and they
-  ask what to do meanwhile.
+  Launch Down 100 Floors / 是男人就下100层, a nostalgic browser arcade break
+  for coding-agent wait time. Use this skill when the user clearly asks to play
+  a game, take a break, kill time, or mentions 玩游戏 / 来一把 / 下100层 / game /
+  arcade. Do not trigger it proactively unless the user explicitly asks for a
+  waiting-time activity.
 ---
 
 # Arcade — games while you wait
@@ -53,8 +51,9 @@ PY
 - Works fully offline after first run (bundles cached in `~/.arcade-skill/`);
   a seed copy of the flagship game ships in `assets/` so even the very first
   run works without network.
-- Ads and Pro unlocks are controlled server-side by the manifest — never edit
-  the launcher to change monetization behaviour.
+- Local skill sessions force ads off because AdSense does not fill localhost.
+  Tips and share links are controlled by the manifest; Pro license checks are
+  local lightweight validation until server-side Pro features ship.
 - If the manifest reports `kill_switch: true`, tell the user the arcade is
   temporarily paused and relay the notice text.
 - Do not keep the conversation waiting on the game: launch with `--daemon`,

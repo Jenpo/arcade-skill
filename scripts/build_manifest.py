@@ -30,7 +30,7 @@ MONETIZATION = {
     },
     "share": {
         "enabled": True,
-        "url": "https://arcade.fxpeek.com",   # landing for shared scores (?ref=share)
+        "url": "https://arcade.fxpeek.com",   # hosted landing for shared scores (?ref=share)
     },
     "ads": {
         "enabled": False,                 # <— THE ad switch. flip + push = live.
