@@ -8,6 +8,58 @@ fast to launch, easy to lose, annoyingly tempting to replay.
 
 ![Arcade Skill running beside a coding-agent session](docs/assets/screenshots/codex-claude-demo.svg)
 
+## Quick Links
+
+[Play hosted web version](https://arcade.fxpeek.com/play/) ·
+[Sponsor on GitHub](https://github.com/sponsors/Jenpo) ·
+[Download arcade.skill](https://github.com/Jenpo/arcade-skill/releases/tag/v1.0.0) ·
+[View manifest](https://arcade.fxpeek.com/manifest.json)
+
+## Strategy
+
+Arcade Skill is not trying to be another generic web games portal. The wedge is
+specific: **your coding agent is working, so you get a tiny arcade break**.
+
+The product has two channels:
+
+| Channel | Where it runs | Job | Monetization |
+| --- | --- | --- | --- |
+| Skill | `127.0.0.1` local browser | Delight developers during agent wait time | Tips, share loop, future supporter perks |
+| Hosted web | `arcade.fxpeek.com/play` | Receive shared scores and public traffic | Future AdSense, ranking, Stripe supporter flow |
+
+Skill sessions force ads off because AdSense does not fill localhost. Ads belong
+only on the hosted web surface.
+
+## Payment And Support
+
+The payment strategy is intentionally trust-first:
+
+- **Tips now:** GitHub Sponsors is live. The repo links to it, and the game only
+  surfaces the coffee link when you hit a new personal best.
+- **Stripe later:** Pro is reserved for cosmetics, early access, supporter
+  badges, or cloud features after real usage signal. No paid power.
+- **Ads later:** AdSense can be enabled on the hosted web version after the site
+  has enough content and review readiness. Local skill sessions stay ad-free.
+
+Current support link:
+
+> https://github.com/sponsors/Jenpo
+
+## Ranking And Fair Play
+
+The current release stores a local best score. Global ranking is planned, but
+ranked mode must stay clean:
+
+- Primary rank: deepest floor reached.
+- Tie-breaker: faster time at the same floor.
+- No paid health.
+- No paid revives.
+- No leaderboard advantage from Stripe, ads, or sponsorship.
+
+The telemetry hook and Cloudflare Worker scaffold are already in the repo; once
+deployed, they will capture death floor, session length, replay rate, share
+clicks, and tip clicks.
+
 ## Project Intro
 
 Choose a language:
@@ -34,17 +86,6 @@ More launch copy, screenshots, positioning notes, and gallery assets live in
   through `https://arcade.fxpeek.com/manifest.json`.
 - Works offline through a seed bundle and cached verified bundles.
 - Uses original game code and art. No copied third-party source or assets.
-
-## Support / GTM
-
-Arcade Skill monetizes like a developer toy, not a pay-to-win mobile game.
-
-- Tips: GitHub Sponsors stays visible in the repo and appears in-game only on a
-  new personal best.
-- Stripe Pro: reserved for later cosmetic perks, early access, or supporter
-  badges. No paid health, paid revives, or leaderboard advantage.
-- Web ads: AdSense can run on the web surface later; localhost skill sessions
-  stay ad-free unless the manifest explicitly says otherwise.
 
 ## Install
 
