@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640" role="img" aria-labelledby="title desc">
+  <title id="title">Down 100 Floors gameplay</title>
+  <desc id="desc">Pixel gameplay scene with platforms, spikes, springs, and floor counter.</desc>
+  <rect width="960" height="640" fill="#111323"/>
+  <rect x="150" y="0" width="660" height="640" rx="0" fill="#151329"/>
+  <rect x="150" y="0" width="48" height="640" fill="#7d4630"/>
+  <rect x="762" y="0" width="48" height="640" fill="#7d4630"/>
+  <rect x="198" y="0" width="564" height="56" fill="#211d36"/>
+  <g fill="#d95757"><path d="M212 56h28l-14-36z"/><path d="M252 56h28l-14-36z"/><path d="M292 56h28l-14-36z"/><path d="M640 56h28l-14-36z"/><path d="M680 56h28l-14-36z"/><path d="M720 56h28l-14-36z"/></g>
+  <text x="226" y="96" font-family="Menlo,Consolas,monospace" font-size="28" font-weight="900" fill="#e8a33d">FLOOR 37</text>
+  <text x="656" y="96" font-family="Menlo,Consolas,monospace" font-size="28" font-weight="900" fill="#e8a33d">HP 7</text>
+  <rect x="246" y="196" width="142" height="22" fill="#a8653c"/><rect x="246" y="196" width="142" height="7" fill="#e8a33d"/>
+  <rect x="526" y="276" width="128" height="22" fill="#a8653c"/><rect x="526" y="276" width="128" height="7" fill="#d95757"/>
+  <path d="M552 276h20l-10-28zM586 276h20l-10-28zM620 276h20l-10-28z" fill="#d95757"/>
+  <rect x="336" y="366" width="168" height="22" fill="#a8653c"/><rect x="336" y="366" width="168" height="7" fill="#5fd08a"/>
+  <text x="398" y="360" font-family="Menlo,Consolas,monospace" font-size="28" fill="#5fd08a">▰▰</text>
+  <rect x="594" y="470" width="150" height="22" fill="#a8653c"/><rect x="594" y="470" width="150" height="7" fill="#e8a33d"/>
+  <rect x="452" y="300" width="48" height="64" fill="#efe6d0"/><rect x="452" y="300" width="48" height="10" fill="#5fd08a"/>
+  <rect x="450" y="364" width="52" height="10" fill="#1a172c"/>
+  <g font-family="Menlo,Consolas,monospace" font-size="18" fill="#aab2c8">
+    <text x="150" y="610">local best saved · no paid power · one more run</text>
+  </g>
+</svg>

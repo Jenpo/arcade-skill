@@ -1,78 +1,87 @@
-# Arcade Skill 🕹️
+# Arcade Skill
 
-Instant mini-games for the moments you're waiting on Claude Code / Codex.
-Say "开个游戏" / "I'm bored" and **Down 100 Floors** opens in your browser.
+An old-school browser arcade break for the age of coding agents.
 
-[Project intro in 中文 / English / Français / Italiano / العربية](docs/project-intro.md)
+When Claude Code, Codex, or another agent is compiling, installing, testing, or
+thinking very hard, Arcade Skill opens a tiny nostalgic game in your browser:
+fast to launch, easy to lose, annoyingly tempting to replay.
 
-- **Thin-shell architecture** — the installed skill is a ~200-line stdlib-only
-  launcher. All games, notices, ad switches and pricing live in a remote
-  `manifest.json`. Shipping an update = `git push`. Users never reinstall.
-- **Offline-capable** — bundles are sha256-verified and cached in
-  `~/.arcade-skill/`; a seed bundle ships inside the skill so the very first
-  run works with no network.
-- **Original code** — clean-room rewrite of the classic falling-floors
-  formula. No third-party game code or art. MIT.
+![Arcade Skill running beside a coding-agent session](docs/assets/screenshots/codex-claude-demo.svg)
 
-## Install (as a Claude skill)
+## Project Intro
 
-Copy the `skill/` folder into your skills directory (or install the packaged
-`arcade.skill` from Releases). Then in any conversation:
+Choose a language:
 
-> 无聊,来一把下100层
+[中文](docs/intro.zh.md) · [English](docs/intro.en.md) · [Français](docs/intro.fr.md) · [Italiano](docs/intro.it.md) · [العربية](docs/intro.ar.md)
 
-Claude runs `python3 scripts/launcher.py --daemon` and hands you a local URL.
+More launch copy, screenshots, positioning notes, and gallery assets live in
+[docs/project-intro.md](docs/project-intro.md).
 
-## Play standalone
+## Screenshots
+
+| Game menu | In game |
+| --- | --- |
+| ![Down 100 Floors start screen](docs/assets/screenshots/tower100-menu.svg) | ![Down 100 Floors gameplay](docs/assets/screenshots/tower100-run.svg) |
+
+## What It Does
+
+- Opens **Down 100 Floors** from a Claude/Codex skill command.
+- Feels like a tiny Flash-era / feature-phone arcade game, but ships as a
+  verified single-file HTML bundle.
+- Keeps the installed skill thin: Python launcher, manifest fetch, sha256 check,
+  local cache, browser open.
+- Ships new games, sponsor links, ads switches, notices, and kill switches
+  through `https://arcade.fxpeek.com/manifest.json`.
+- Works offline through a seed bundle and cached verified bundles.
+- Uses original game code and art. No copied third-party source or assets.
+
+## Install
+
+Install the packaged `arcade.skill` from Releases, or copy the `skill/` folder
+into your local skills directory. Then ask your coding agent:
+
+> 无聊, 来一把下100层
+
+or:
+
+> I'm waiting on tests. Open a quick game.
+
+## Play Standalone
 
 ```bash
 python3 skill/scripts/launcher.py            # zh UI
 python3 skill/scripts/launcher.py --lang en  # en UI
 ```
 
-Controls: ← → / A D, or tap left/right half on touch screens.
-Land on floors to heal, avoid spikes, don't touch the ceiling. How deep can you go?
+Controls: arrow keys, A/D, or tap the left/right half of the screen. The loop is
+deliberately retro: fall, panic, miss a platform, say “one more run.”
 
-## Repo layout
+## Repo Layout
 
-```
-skill/            the distributable skill (SKILL.md + launcher + seed bundle)
-games/tower100/   game source — single self-contained HTML file
-scripts/          build_manifest.py: hash bundles, write dist/manifest.json
-dist/             build output = what GitHub Pages serves
-.github/          CI: push to main → build → deploy Pages
-```
-
-## Releasing an update (hot update)
-
-1. Edit `games/tower100/tower100.html`
-2. Bump the version in `scripts/build_manifest.py` → `VERSIONS`
-3. `git push` — CI rebuilds `dist/` and redeploys Pages
-4. Every user gets the new bundle on next launch. That's it.
-
-Flipping ads on later is the same motion: set
-`MONETIZATION.ads.enabled = True` (plus your AdSense ids) and push.
-
-## First-time setup after cloning
-
-One command (requires `git` + [GitHub CLI](https://cli.github.com) with `gh auth login` done):
-
-```bash
-./publish.sh <your-github-username>
+```text
+skill/            distributable skill: SKILL.md, launcher, seed bundle
+games/tower100/   game source: single self-contained HTML file
+scripts/          build_manifest.py: hash bundles and write dist/manifest.json
+dist/             GitHub Pages output
+docs/             screenshots, language intros, launch copy
+.github/          CI: push to main -> build -> deploy Pages
 ```
 
-It bakes your username into the manifest URLs, builds `dist/`, creates the
-repo, pushes, enables Pages (Actions source), and publishes `arcade.skill`
-as Release v1.0.0. Prefer a custom domain? Edit `BASE_URL` in
-`scripts/build_manifest.py` and the `MANIFEST_URLS` list in
-`skill/scripts/launcher.py` before running.
+## Release Flow
+
+1. Edit `games/tower100/tower100.html`.
+2. Bump the version in `scripts/build_manifest.py`.
+3. Push to `main`.
+4. GitHub Actions rebuilds `dist/` and deploys Pages.
+5. Installed users receive the new bundle on next launch.
 
 ## Roadmap
 
-- [x] M1 — tower100 + manifest hot-update loop
-- [ ] M2 — hub page, second game (snake), WeChat mini-game adapter fork
-- [ ] M3 — AdSense switch-on, Stripe Pro licenses, global leaderboard
+- [x] M1: Down 100 Floors + hot-update loader
+- [x] M1.1: sharing, sponsor link, multilingual project intro
+- [ ] M2: hub screen, second game, WeChat mini-game adapter
+- [ ] M3: AdSense switch, Stripe Pro license flow, global leaderboard
 
 ## License
 
-MIT — game code and art are original to this repository.
+MIT.
