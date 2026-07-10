@@ -16,9 +16,11 @@ DOCS = ROOT / "docs"
 BASE_URL = "https://arcade.fxpeek.com"       # owned domain; CNAME → GitHub Pages
 CUSTOM_DOMAIN = "arcade.fxpeek.com"          # written to dist/CNAME for Pages
 SIGNING_KEY_B64 = os.environ.get("ARCADE_MANIFEST_SIGNING_KEY", "")
+STRIPE_SUPPORT_URL = os.environ.get(
+    "ARCADE_STRIPE_SUPPORT_URL", f"{BASE_URL}/support/")
 VERSIONS = {
     "tower100": {
-        "version": "1.5.0",
+        "version": "1.5.1",
         "src": ROOT / "games/tower100/tower100.html",
         "title": {"zh": "是男人就下100层", "en": "Down 100 Floors"},
         "tier": "free",
@@ -26,8 +28,9 @@ VERSIONS = {
 }
 MONETIZATION = {
     "tips": {
-        "enabled": True,                  # NEW BEST moment tip line + link
-        "url": "https://github.com/sponsors/Jenpo",
+        "enabled": True,                  # game-over support link
+        "provider": "stripe",
+        "url": STRIPE_SUPPORT_URL,
     },
     "share": {
         "enabled": True,
@@ -124,6 +127,12 @@ def main():
             play_dir.mkdir(exist_ok=True)
             shutil.copy2(play, play_dir / "index.html")
             shutil.copy2(play, DIST / "play.html")
+        support = DOCS / "support.html"
+        if support.exists():
+            support_dir = DIST / "support"
+            support_dir.mkdir(exist_ok=True)
+            shutil.copy2(support, support_dir / "index.html")
+            shutil.copy2(support, DIST / "support.html")
     print(f"manifest {manifest['manifest_version']} → dist/manifest.json  (CNAME: {CUSTOM_DOMAIN})")
 
 

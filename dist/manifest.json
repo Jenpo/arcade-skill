@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "manifest_version": "2026.07.11-0027",
+  "manifest_version": "2026.07.11-0036",
   "min_loader_version": "1.0.0",
   "kill_switch": false,
   "notice": {
@@ -10,7 +10,8 @@
   "monetization": {
     "tips": {
       "enabled": true,
-      "url": "https://github.com/sponsors/Jenpo"
+      "provider": "stripe",
+      "url": "https://arcade.fxpeek.com/support/"
     },
     "share": {
       "enabled": true,
@@ -42,10 +43,10 @@
         "zh": "是男人就下100层",
         "en": "Down 100 Floors"
       },
-      "version": "1.5.0",
-      "entry": "https://arcade.fxpeek.com/bundles/tower100-1.5.0.html",
-      "sha256": "c65e933fc5baf8f5743f78af2f57501b75092a6c66479c72e3dbe88f64df300a",
-      "size_kb": 20.1,
+      "version": "1.5.1",
+      "entry": "https://arcade.fxpeek.com/bundles/tower100-1.5.1.html",
+      "sha256": "9defc2e001da99028de768c0e629d24b29ce468ea74668958878ac16639f71c5",
+      "size_kb": 20.3,
       "tier": "free",
       "min_loader_version": "1.0.0"
     }

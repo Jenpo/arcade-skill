@@ -65,7 +65,7 @@ const T = {
       daily:"今日挑战", normal:"普通模式",
       music:"M 静音 BGM",
       pause:"已暂停", resume:"按 P / 点击 继续", recap:(f)=>`全服占位数据: 62% 的玩家倒在 ${Math.max(10,Math.ceil(f/10)*10)} 层前`,
-      tip:"NEW BEST! 请作者喝杯咖啡 →",
+      tip:"用 Stripe 支持这个小游戏 →", newBestTip:"NEW BEST! 用 Stripe 请作者喝杯咖啡 →",
       shareTexts:[
         (f,u,m)=>`AI 还在跑测试, 我在${m}下到了第 ${f} 层: ${u}`,
         (f,u,m)=>`复古摸鱼成绩单: ${m} / 第 ${f} 层。能不能超过我? ${u}`,
@@ -77,7 +77,7 @@ const T = {
       daily:"Daily Challenge", normal:"Normal Run",
       music:"M mute BGM",
       pause:"PAUSED", resume:"P / TAP to resume", recap:(f)=>`Placeholder stat: 62% of players fall before floor ${Math.max(10,Math.ceil(f/10)*10)}`,
-      tip:"NEW BEST! Buy the dev a coffee →",
+      tip:"Support this tiny arcade via Stripe →", newBestTip:"NEW BEST! Buy the dev a coffee via Stripe →",
       shareTexts:[
         (f,u,m)=>`My agent was busy, so I fell to floor ${f} in ${m}: ${u}`,
         (f,u,m)=>`Retro wait-time score: ${m}, floor ${f}. Beat this: ${u}`,
@@ -85,7 +85,7 @@ const T = {
       ]}
 }[CFG.lang === "en" ? "en" : "zh"];
 
-const GAME_VERSION = "1.5.0";
+const GAME_VERSION = "1.5.1";
 const SESSION_ID = (() => {
   try{ const a=new Uint32Array(2); crypto.getRandomValues(a); return [...a].map(x=>x.toString(16)).join(""); }
   catch(e){ return String(Date.now()) + Math.random().toString(16).slice(2); }
@@ -312,7 +312,7 @@ function togglePause(reason){
   else if(mode==="pause"){ mode="play"; beep("land"); startMusic(); emit("resume",{reason:reason||pauseFrom,floor:g.floor}); }
 }
 
-/* ---- game-over meta row: share always, tip only on NEW BEST ---- */
+/* ---- game-over meta row: share + Stripe support ---- */
 const meta=document.getElementById("meta-row");
 function showMeta(){
   meta.innerHTML="";
@@ -328,10 +328,11 @@ function showMeta(){
     };
     meta.appendChild(b);
   }
-  if(g.newBest&&CFG.tips&&CFG.tips.enabled&&CFG.tips.url){
-    const a=document.createElement("a"); a.id="tip-link"; a.textContent=T.tip;
+  if(CFG.tips&&CFG.tips.enabled&&CFG.tips.url){
+    const a=document.createElement("a"); a.id="tip-link";
+    a.textContent=g.newBest ? T.newBestTip : T.tip;
     a.href=CFG.tips.url; a.target="_blank"; a.rel="noopener";
-    a.onclick=()=>emit("tip_click",{floor:g.floor});
+    a.onclick=()=>emit("tip_click",{floor:g.floor, provider:CFG.tips.provider||"stripe"});
     meta.appendChild(a);
   }
   if(meta.children.length) meta.classList.add("on");

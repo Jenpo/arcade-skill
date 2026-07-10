@@ -16,7 +16,7 @@ fast to launch, easy to lose, annoyingly tempting to replay.
 
 [Play hosted web version](https://arcade.fxpeek.com/play/) ·
 [Daily challenge](https://arcade.fxpeek.com/play/?daily=1) ·
-[Sponsor on GitHub](https://github.com/sponsors/Jenpo) ·
+[Support via Stripe](https://arcade.fxpeek.com/support/) ·
 [Download arcade.skill](https://github.com/Jenpo/arcade-skill/releases/tag/v1.0.0) ·
 [View manifest](https://arcade.fxpeek.com/manifest.json) ·
 [Review action matrix](docs/review-action-matrix.md)
@@ -48,8 +48,9 @@ only on the hosted web surface.
 
 The payment strategy is intentionally trust-first:
 
-- **Tips now:** GitHub Sponsors is live. The repo links to it, and the game only
-  surfaces the coffee link when you hit a new personal best.
+- **Stripe support now:** the repo, hosted play page, and game-over screen point
+  to the Stripe support route. The final `buy.stripe.com` link can be swapped in
+  through the manifest after account review.
 - **Stripe later:** Pro is reserved for cosmetics, early access, supporter
   badges, or cloud features after real usage signal. No paid power.
 - **Ads later:** AdSense can be enabled on the hosted web version after the site
@@ -57,7 +58,7 @@ The payment strategy is intentionally trust-first:
 
 Current support link:
 
-> https://github.com/sponsors/Jenpo
+> https://arcade.fxpeek.com/support/
 
 ## Ranking And Fair Play
 

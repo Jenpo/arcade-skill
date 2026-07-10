@@ -23,7 +23,7 @@ verify from code, manifest, docs, or deployment status.
 | Add daily seed challenge | Done | Hosted `/play/?daily=1` injects daily mode; the game uses the date seed and emits mode/seed. |
 | Rotate share text variants | Done | Share copy now rotates between score, challenge, and agent-wait variants. |
 | Add hosted playable web version | Done | `docs/play.html` is deployed as `/play/` and embeds the verified bundle. |
-| Surface tips, Stripe, and ranking strategy in README | Done | README now has Payment And Support, Ranking And Fair Play, and Play Modes sections. |
+| Surface tips, Stripe, and ranking strategy in README | Done | README now has visible Stripe support, Ranking And Fair Play, and Play Modes sections. |
 | Add screenshots / demo feeling | Done | SVG screenshots show Codex/Claude side-by-side demo, menu, and gameplay. |
 | Clarify player character | Done | The player sprite is an 8-bit small person, not a plain block. |
 | Telemetry receiver | Done | Cloudflare Worker is live at `https://telemetry.fxpeek.com/event`; D1 database `arcade_telemetry` stores accepted events. |
@@ -34,7 +34,7 @@ verify from code, manifest, docs, or deployment status.
 | --- | --- | --- |
 | `arcade.fxpeek.com` HTTPS certificate | Content works through GitHub Pages, but normal curl still reports certificate validation failure until GitHub Pages finishes custom-domain cert issuance. | Recheck GitHub Pages certificate, then enforce HTTPS once certificate exists. |
 | AdSense | Hosted slot exists, local sessions stay ad-free. | Apply only after the hosted site has enough content and AdSense approves `arcade.fxpeek.com`. |
-| Stripe supporter flow | Strategy and README are ready; no paid-power feature is shipped. | Add Stripe Payment Link only after usage signal; Pro must stay cosmetic/supporter-only. |
+| Stripe checkout link | Stripe account review currently blocks creating a new Payment Link. | Replace `/support/` with `buy.stripe.com/...` in manifest when Stripe review completes. |
 
 ## Deferred Product Work
 
