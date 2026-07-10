@@ -1,5 +1,9 @@
 # Arcade Skill
 
+## Languages
+
+[中文](docs/intro.zh.md) · [English](docs/intro.en.md) · [Français](docs/intro.fr.md) · [Italiano](docs/intro.it.md) · [العربية](docs/intro.ar.md)
+
 An old-school browser arcade break for the age of coding agents.
 
 When Claude Code, Codex, or another agent is compiling, installing, testing, or
@@ -70,10 +74,6 @@ The telemetry hook and Cloudflare Worker + D1 receiver are live. They capture
 death floor, session length, replay rate, share clicks, and tip clicks.
 
 ## Project Intro
-
-Choose a language:
-
-[中文](docs/intro.zh.md) · [English](docs/intro.en.md) · [Français](docs/intro.fr.md) · [Italiano](docs/intro.it.md) · [العربية](docs/intro.ar.md)
 
 More launch copy, screenshots, positioning notes, and gallery assets live in
 [docs/project-intro.md](docs/project-intro.md).

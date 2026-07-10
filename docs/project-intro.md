@@ -1,11 +1,11 @@
 # Arcade Skill Project Intro
 
-Ready-to-use project descriptions, screenshots, and launch positioning for
-GitHub, directories, launch posts, and landing pages.
-
 ## Languages
 
 [中文](intro.zh.md) · [English](intro.en.md) · [Français](intro.fr.md) · [Italiano](intro.it.md) · [العربية](intro.ar.md)
+
+Ready-to-use project descriptions, screenshots, and launch positioning for
+GitHub, directories, launch posts, and landing pages.
 
 ## Screenshot Gallery
 
