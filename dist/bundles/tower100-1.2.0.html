@@ -49,7 +49,8 @@
 
 /* ---------------- [CFG] runtime config ---------------- */
 const CFG = (() => {
-  const def = { lang:"zh", ads:{enabled:false}, pro:false, source:"standalone" };
+  const def = { lang:"zh", ads:{enabled:false}, pro:false, source:"standalone",
+    telemetry:{enabled:false, endpoint:"", sample_rate:1} };
   try{
     const q = new URLSearchParams(location.search).get("cfg");
     if(q) return Object.assign(def, JSON.parse(decodeURIComponent(escape(atob(q)))));
@@ -68,8 +69,30 @@ const T = {
       tip:"NEW BEST! Buy the dev a coffee →", shareText:(f,u)=>`I reached floor ${f} in Down 100 Floors while my agent was working 🕹️ ${u}?ref=share`}
 }[CFG.lang === "en" ? "en" : "zh"];
 
+const GAME_VERSION = "1.2.0";
+const SESSION_ID = (() => {
+  try{ const a=new Uint32Array(2); crypto.getRandomValues(a); return [...a].map(x=>x.toString(16)).join(""); }
+  catch(e){ return String(Date.now()) + Math.random().toString(16).slice(2); }
+})();
+const START_AT = Date.now();
+
 function emit(type, data){ /* event contract: game_over / floor / session_start */
-  try{ parent.postMessage({arcade:true, game:"tower100", type, data}, "*"); }catch(e){}
+  const payload = {arcade:true, game:"tower100", version:GAME_VERSION, type, data:data||{},
+    session_id:SESSION_ID, source:CFG.source||"standalone", ts:Date.now(),
+    elapsed_ms:Date.now()-START_AT};
+  try{ parent.postMessage(payload, "*"); }catch(e){}
+  const t = CFG.telemetry || {};
+  if(!t.enabled || !t.endpoint) return;
+  if((t.sample_rate||1) < 1 && Math.random() > t.sample_rate) return;
+  try{
+    const body = JSON.stringify(payload);
+    if(navigator.sendBeacon){
+      navigator.sendBeacon(t.endpoint, new Blob([body], {type:"application/json"}));
+    }else{
+      fetch(t.endpoint, {method:"POST", headers:{"content-type":"application/json"},
+        body, keepalive:true, mode:"cors"}).catch(()=>{});
+    }
+  }catch(e){}
 }
 
 /* ---------------- [CORE] pure logic ---------------- */
@@ -129,7 +152,7 @@ function step(g, input){
       if(p.type===PLAT.FRAGILE && p.hits>18){ continue; }   // broken
       g.py=sy-g.ph; g.vy=0; g.onPlat=p;
       if(!p.counted){ p.counted=true;
-        if(p.id>g.floor){ g.floor=p.id; emit("floor",{floor:g.floor}); }
+        if(p.id>g.floor){ g.floor=p.id; if(g.floor===1 || g.floor%5===0) emit("floor",{floor:g.floor}); }
         if(p.type!==PLAT.SPIKE && g.hp<g.hpMax) g.hp++;      // classic heal-on-land
       }
       if(p.type===PLAT.SPIKE && g.inv<=0){ damage(g,2); }

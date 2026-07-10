@@ -182,6 +182,7 @@ def build_cfg(manifest: dict, lang: str) -> str:
     ads["_reason"] = "adsense_no_fill_on_localhost"
     cfg = {"lang": lang, "ads": ads, "pro": check_license(), "source": "skill",
            "tips": mon.get("tips", {}), "share": mon.get("share", {}),
+           "telemetry": mon.get("telemetry", {}),
            "loader": LOADER_VERSION}
     return base64.b64encode(json.dumps(cfg, separators=(",", ":")).encode()).decode()
 

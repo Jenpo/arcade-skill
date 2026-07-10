@@ -17,7 +17,7 @@ BASE_URL = "https://arcade.fxpeek.com"       # owned domain; CNAME → GitHub Pa
 CUSTOM_DOMAIN = "arcade.fxpeek.com"          # written to dist/CNAME for Pages
 VERSIONS = {
     "tower100": {
-        "version": "1.1.2",
+        "version": "1.2.0",
         "src": ROOT / "games/tower100/tower100.html",
         "title": {"zh": "是男人就下100层", "en": "Down 100 Floors"},
         "tier": "free",
@@ -42,6 +42,11 @@ MONETIZATION = {
         "enabled": False,                 # flip on when Stripe track ships (M3)
         "stripe_payment_link": "",
         "license_pubkey": "",
+    },
+    "telemetry": {
+        "enabled": False,                 # enable after Worker route is deployed
+        "endpoint": "https://arcade.fxpeek.com/api/event",
+        "sample_rate": 1.0,
     },
 }
 
