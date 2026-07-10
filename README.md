@@ -11,9 +11,11 @@ fast to launch, easy to lose, annoyingly tempting to replay.
 ## Quick Links
 
 [Play hosted web version](https://arcade.fxpeek.com/play/) ·
+[Daily challenge](https://arcade.fxpeek.com/play/?daily=1) ·
 [Sponsor on GitHub](https://github.com/sponsors/Jenpo) ·
 [Download arcade.skill](https://github.com/Jenpo/arcade-skill/releases/tag/v1.0.0) ·
-[View manifest](https://arcade.fxpeek.com/manifest.json)
+[View manifest](https://arcade.fxpeek.com/manifest.json) ·
+[Review action matrix](docs/review-action-matrix.md)
 
 ## Strategy
 
@@ -29,6 +31,14 @@ The product has two channels:
 
 Skill sessions force ads off because AdSense does not fill localhost. Ads belong
 only on the hosted web surface.
+
+## Play Modes
+
+- **Normal run:** random quick break for agent wait time.
+- **Daily challenge:** one shared date seed per day, so friends play the same
+  shaft and can compare scores from the share link.
+- **Ranked direction:** global ranking will separate normal and daily runs, with
+  floor reached as the primary score and time as the tie-breaker.
 
 ## Payment And Support
 
