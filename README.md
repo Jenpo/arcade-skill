@@ -51,10 +51,6 @@ Arcade Skill monetizes like a developer toy, not a pay-to-win mobile game.
 Install the packaged `arcade.skill` from Releases, or copy the `skill/` folder
 into your local skills directory. Then ask your coding agent:
 
-> 无聊, 来一把下100层
-
-or:
-
 > I'm waiting on tests. Open a quick game.
 
 ## Play Standalone

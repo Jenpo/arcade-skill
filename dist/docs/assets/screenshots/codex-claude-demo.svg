@@ -20,7 +20,7 @@
   <text x="104" y="462" font-family="Menlo,Consolas,monospace" font-size="18" fill="#d7f7e9">[arcade] opened local browser session</text>
   <text x="104" y="500" font-family="Menlo,Consolas,monospace" font-size="18" fill="#f4d06f">[tests] still running...</text>
   <rect x="80" y="814" width="592" height="54" rx="8" fill="#fff" stroke="#d9d3c8"/>
-  <text x="104" y="848" font-family="Inter,Arial,sans-serif" font-size="20" fill="#42494d">无聊, 来一把下100层</text>
+  <text x="104" y="848" font-family="Inter,Arial,sans-serif" font-size="20" fill="#42494d">Tests are running. Open a quick arcade break.</text>
   <rect x="740" y="42" width="658" height="876" rx="8" fill="#10121f" stroke="#d9d3c8"/>
   <rect x="740" y="42" width="658" height="56" rx="8" fill="#171a29"/>
   <circle cx="775" cy="70" r="6" fill="#ff6b6b"/><circle cx="797" cy="70" r="6" fill="#ffd166"/><circle cx="819" cy="70" r="6" fill="#06d6a0"/>
