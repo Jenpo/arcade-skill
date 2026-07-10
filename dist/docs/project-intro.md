@@ -37,6 +37,7 @@ and early mobile game folders:
 - Land on platforms to survive.
 - Avoid spikes and the ceiling.
 - Chase a deeper floor and a cleaner run.
+- Hear tiny zero-asset chiptune BGM and arcade synth hits after the first input.
 
 ## Ranking Direction
 

@@ -89,6 +89,7 @@ More launch copy, screenshots, positioning notes, and gallery assets live in
 - Opens **Down 100 Floors** from a Claude/Codex skill command.
 - Feels like a tiny Flash-era / feature-phone arcade game, but ships as a
   verified single-file HTML bundle.
+- Uses zero-asset WebAudio for landing, damage, death, and chiptune BGM.
 - Keeps the installed skill thin: Python launcher, manifest fetch, sha256 check,
   local cache, browser open.
 - Ships new games, sponsor links, ads switches, notices, and kill switches

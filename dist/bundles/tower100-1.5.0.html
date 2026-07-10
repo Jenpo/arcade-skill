@@ -63,6 +63,7 @@ const T = {
       floor:"层", best:"最佳", over:"游戏结束", retry:"空格 / 点击 再来一局", hp:"血量",
       reached:"你下到了第", floors:"层", share:"分享战绩", copied:"已复制 ✓",
       daily:"今日挑战", normal:"普通模式",
+      music:"M 静音 BGM",
       pause:"已暂停", resume:"按 P / 点击 继续", recap:(f)=>`全服占位数据: 62% 的玩家倒在 ${Math.max(10,Math.ceil(f/10)*10)} 层前`,
       tip:"NEW BEST! 请作者喝杯咖啡 →",
       shareTexts:[
@@ -74,6 +75,7 @@ const T = {
       floor:"FLOOR", best:"BEST", over:"GAME OVER", retry:"SPACE / TAP to retry", hp:"HP",
       reached:"You reached floor", floors:"", share:"Share score", copied:"Copied ✓",
       daily:"Daily Challenge", normal:"Normal Run",
+      music:"M mute BGM",
       pause:"PAUSED", resume:"P / TAP to resume", recap:(f)=>`Placeholder stat: 62% of players fall before floor ${Math.max(10,Math.ceil(f/10)*10)}`,
       tip:"NEW BEST! Buy the dev a coffee →",
       shareTexts:[
@@ -83,7 +85,7 @@ const T = {
       ]}
 }[CFG.lang === "en" ? "en" : "zh"];
 
-const GAME_VERSION = "1.4.0";
+const GAME_VERSION = "1.5.0";
 const SESSION_ID = (() => {
   try{ const a=new Uint32Array(2); crypto.getRandomValues(a); return [...a].map(x=>x.toString(16)).join(""); }
   catch(e){ return String(Date.now()) + Math.random().toString(16).slice(2); }
@@ -228,21 +230,53 @@ const store={
 
 let mode="menu", g=newGame(RUN_SEED), input={left:false,right:false}, pauseFrom="user";
 const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
-let audioCtx=null;
+let audioCtx=null, musicTimer=null, musicStep=0, musicMuted=false;
+
+function ensureAudio(){
+  audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==="suspended") audioCtx.resume();
+  return audioCtx;
+}
+
+function tone(freq, dur, gainValue, type, dest){
+  const ac=ensureAudio(), o=ac.createOscillator(), gain=ac.createGain();
+  const now=ac.currentTime;
+  o.type=type||"square"; o.frequency.setValueAtTime(freq, now);
+  gain.gain.setValueAtTime(gainValue, now);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now+dur);
+  o.connect(gain); gain.connect(dest||ac.destination); o.start(now); o.stop(now+dur);
+}
 
 function beep(kind){
   try{
-    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
-    if(audioCtx.state==="suspended") audioCtx.resume();
-    const o=audioCtx.createOscillator(), gain=audioCtx.createGain();
-    const now=audioCtx.currentTime;
     const spec = kind==="hurt" ? [110,.12,.06,"square"] :
       kind==="over" ? [75,.32,.08,"sawtooth"] : [520,.07,.04,"square"];
-    o.type=spec[3]; o.frequency.setValueAtTime(spec[0], now);
-    gain.gain.setValueAtTime(spec[2], now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now+spec[1]);
-    o.connect(gain); gain.connect(audioCtx.destination); o.start(now); o.stop(now+spec[1]);
+    tone(spec[0], spec[1], spec[2], spec[3]);
   }catch(e){}
+}
+
+function musicTick(){
+  if(musicMuted||mode!=="play") return;
+  try{
+    const lead=[392,0,523,0,587,523,392,0,330,0,392,440,523,0,440,0];
+    const bass=[98,98,131,131,147,147,131,131,87,87,110,110,131,131,98,98];
+    const i=musicStep++%lead.length;
+    if(lead[i]) tone(lead[i], .09, .018, "square");
+    if(i%2===0) tone(bass[i], .16, .012, "triangle");
+  }catch(e){}
+}
+function startMusic(){
+  if(musicMuted||musicTimer) return;
+  musicTick();
+  musicTimer=setInterval(musicTick, 145);
+}
+function stopMusic(){
+  if(musicTimer){ clearInterval(musicTimer); musicTimer=null; }
+}
+function toggleMusic(){
+  musicMuted=!musicMuted;
+  if(musicMuted) stopMusic(); else if(mode==="play") startMusic();
+  emit("music_toggle",{muted:musicMuted});
 }
 
 addEventListener("keydown",e=>{
@@ -250,6 +284,7 @@ addEventListener("keydown",e=>{
   if(e.code==="ArrowRight"||e.code==="KeyD") input.right=true;
   if(e.code==="Space"||e.code==="Enter"){ e.preventDefault(); action(); }
   if(e.code==="KeyP"){ e.preventDefault(); togglePause("user"); }
+  if(e.code==="KeyM"){ e.preventDefault(); toggleMusic(); }
 });
 addEventListener("keyup",e=>{
   if(e.code==="ArrowLeft"||e.code==="KeyA") input.left=false;
@@ -267,14 +302,14 @@ addEventListener("blur",()=>{ if(mode==="play") pause("blur"); });
 function action(){
   if(mode==="menu"||mode==="over"){
     if(mode==="over"){ hideAd(); hideMeta(); }
-    g=newGame(RUN_SEED); mode="play"; beep("land");
+    g=newGame(RUN_SEED); mode="play"; beep("land"); startMusic();
     emit("session_start",{mode:DAILY_MODE?"daily":"normal", seed:RUN_SEED||null});
   }
 }
-function pause(reason){ pauseFrom=reason||"user"; mode="pause"; emit("pause",{reason:pauseFrom,floor:g.floor}); }
+function pause(reason){ pauseFrom=reason||"user"; mode="pause"; stopMusic(); emit("pause",{reason:pauseFrom,floor:g.floor}); }
 function togglePause(reason){
   if(mode==="play") pause(reason);
-  else if(mode==="pause"){ mode="play"; beep("land"); emit("resume",{reason:reason||pauseFrom,floor:g.floor}); }
+  else if(mode==="pause"){ mode="play"; beep("land"); startMusic(); emit("resume",{reason:reason||pauseFrom,floor:g.floor}); }
 }
 
 /* ---- game-over meta row: share always, tip only on NEW BEST ---- */
@@ -383,7 +418,8 @@ function drawMenu(){
   text(T.how,W/2,420,15,C.dim);
   text(DAILY_MODE?T.daily:T.normal,W/2,450,14,DAILY_MODE?C.spring:C.dim);
   if((performance.now()/500|0)%2) text(T.start,W/2,480,18,C.ink);
-  text(`${T.best} ${store.best}`,W/2,530,14,C.dim);
+  text(T.music,W/2,510,13,C.dim);
+  text(`${T.best} ${store.best}`,W/2,548,14,C.dim);
 }
 function drawOver(){
   cx.fillStyle="rgba(12,10,26,.78)"; cx.fillRect(0,0,W,H);
@@ -408,6 +444,7 @@ function loop(){
     drawCeiling(); drawPlayer(); drawHud();
     cx.restore();
     if(g.over){ mode="over";
+      stopMusic();
       beep("over");
       g.newBest = g.floor>store.best;
       if(g.newBest) store.best=g.floor;

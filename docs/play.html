@@ -63,6 +63,6 @@ const cfg = {
   telemetry: {enabled: false, endpoint: "https://arcade.fxpeek.com/api/event", sample_rate: 1}
 };
 const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
-document.getElementById("game").src = "/bundles/tower100-1.4.0.html?cfg=" + encoded;
+document.getElementById("game").src = "/bundles/tower100-1.5.0.html?cfg=" + encoded;
 </script>
 </html>

@@ -18,7 +18,7 @@ CUSTOM_DOMAIN = "arcade.fxpeek.com"          # written to dist/CNAME for Pages
 SIGNING_KEY_B64 = os.environ.get("ARCADE_MANIFEST_SIGNING_KEY", "")
 VERSIONS = {
     "tower100": {
-        "version": "1.4.0",
+        "version": "1.5.0",
         "src": ROOT / "games/tower100/tower100.html",
         "title": {"zh": "是男人就下100层", "en": "Down 100 Floors"},
         "tier": "free",
