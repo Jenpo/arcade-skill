@@ -26,13 +26,13 @@ verify from code, manifest, docs, or deployment status.
 | Surface tips, Stripe, and ranking strategy in README | Done | README now has Payment And Support, Ranking And Fair Play, and Play Modes sections. |
 | Add screenshots / demo feeling | Done | SVG screenshots show Codex/Claude side-by-side demo, menu, and gameplay. |
 | Clarify player character | Done | The player sprite is an 8-bit small person, not a plain block. |
+| Telemetry receiver | Done | Cloudflare Worker is live at `https://telemetry.fxpeek.com/event`; D1 database `arcade_telemetry` stores accepted events. |
 
 ## Deployment-Dependent
 
 | Review item | Current state | Next action |
 | --- | --- | --- |
 | `arcade.fxpeek.com` HTTPS certificate | Content works through GitHub Pages, but normal curl still reports certificate validation failure until GitHub Pages finishes custom-domain cert issuance. | Recheck GitHub Pages certificate, then enforce HTTPS once certificate exists. |
-| Telemetry receiver | Worker code, D1 schema, and event contract exist; manifest keeps telemetry disabled. | Complete Cloudflare login, create D1, deploy Worker, then flip `telemetry.enabled`. |
 | AdSense | Hosted slot exists, local sessions stay ad-free. | Apply only after the hosted site has enough content and AdSense approves `arcade.fxpeek.com`. |
 | Stripe supporter flow | Strategy and README are ready; no paid-power feature is shipped. | Add Stripe Payment Link only after usage signal; Pro must stay cosmetic/supporter-only. |
 

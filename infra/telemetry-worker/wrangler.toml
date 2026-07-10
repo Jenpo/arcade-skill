@@ -5,4 +5,4 @@ compatibility_date = "2026-07-10"
 [[d1_databases]]
 binding = "DB"
 database_name = "arcade_telemetry"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "df7124ef-d2f8-4fa3-8a72-b9942f682e66"

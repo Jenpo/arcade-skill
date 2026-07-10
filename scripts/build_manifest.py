@@ -45,8 +45,8 @@ MONETIZATION = {
         "license_pubkey": "",
     },
     "telemetry": {
-        "enabled": False,                 # enable after Worker route is deployed
-        "endpoint": "https://arcade.fxpeek.com/api/event",
+        "enabled": True,                  # Worker + D1 deployed
+        "endpoint": "https://telemetry.fxpeek.com/event",
         "sample_rate": 1.0,
     },
 }

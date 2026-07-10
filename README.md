@@ -66,9 +66,8 @@ ranked mode must stay clean:
 - No paid revives.
 - No leaderboard advantage from Stripe, ads, or sponsorship.
 
-The telemetry hook and Cloudflare Worker scaffold are already in the repo; once
-deployed, they will capture death floor, session length, replay rate, share
-clicks, and tip clicks.
+The telemetry hook and Cloudflare Worker + D1 receiver are live. They capture
+death floor, session length, replay rate, share clicks, and tip clicks.
 
 ## Project Intro
 
