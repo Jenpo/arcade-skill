@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Down 100 Floors · 是男人就下100层</title>
+<style>
+  :root{
+    --shaft:#151329; --wall:#7d4630; --wall-dark:#5c3222;
+    --amber:#e8a33d; --ink:#efe6d0; --danger:#d95757; --spring:#5fd08a;
+  }
+  html,body{margin:0;padding:0;height:100%;background:var(--shaft);overflow:hidden;
+    font-family:ui-monospace,'Cascadia Mono','JetBrains Mono',Menlo,monospace;}
+  #wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;}
+  canvas{image-rendering:pixelated;image-rendering:crisp-edges;touch-action:none;
+    box-shadow:0 0 0 4px var(--wall-dark),0 24px 60px rgba(0,0,0,.6);}
+  #ad-slot{width:min(480px,92vw);margin-top:10px;display:none;min-height:60px;}
+  #ad-slot.on{display:block;}
+  #meta-row{width:min(480px,92vw);margin-top:12px;display:none;gap:10px;
+    justify-content:center;align-items:center;flex-wrap:wrap;}
+  #meta-row.on{display:flex;}
+  #meta-row button,#meta-row a{font:bold 13px ui-monospace,Menlo,monospace;cursor:pointer;
+    padding:8px 14px;border:2px solid var(--amber);background:transparent;color:var(--amber);
+    text-decoration:none;border-radius:2px;}
+  #meta-row button:hover,#meta-row a:hover{background:var(--amber);color:var(--shaft);}
+  #tip-link{border-color:var(--spring)!important;color:var(--spring)!important;}
+  #tip-link:hover{background:var(--spring)!important;color:var(--shaft)!important;}
+  @media (prefers-reduced-motion: reduce){ .noshake{ } }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game" width="480" height="640"></canvas>
+  <div id="meta-row"></div>
+  <div id="ad-slot"></div>
+</div>
+<script>
+"use strict";
+/* ============================================================
+ * Down 100 Floors — Arcade Skill original implementation.
+ * Clean-room rewrite of the classic falling-floors formula.
+ * Single file, zero external assets. MIT.
+ *
+ * Sections:
+ *   [CFG]  runtime config injected by launcher (?cfg=base64 JSON)
+ *   [CORE] pure game logic — no DOM access, portable to wx adapter
+ *   [WEB]  browser adapter: canvas render, input, storage, ads
+ * ============================================================ */
+
+/* ---------------- [CFG] runtime config ---------------- */
+const CFG = (() => {
+  const def = { lang:"zh", ads:{enabled:false}, pro:false, source:"standalone" };
+  try{
+    const q = new URLSearchParams(location.search).get("cfg");
+    if(q) return Object.assign(def, JSON.parse(decodeURIComponent(escape(atob(q)))));
+  }catch(e){ /* bad cfg -> defaults */ }
+  return def;
+})();
+
+const T = {
+  zh:{title:"是男人就下100层", start:"按 空格 / 点击 开始", how:"← → 移动 · 落在平台上回血 · 别碰刺",
+      floor:"层", best:"最佳", over:"游戏结束", retry:"空格 / 点击 再来一局", hp:"血量",
+      reached:"你下到了第", floors:"层", share:"分享战绩", copied:"已复制 ✓",
+      tip:"NEW BEST! 请作者喝杯咖啡 →", shareText:(f,u)=>`我在《是男人就下100层》摸鱼下到了第 ${f} 层 🕹️ ${u}?ref=share`},
+  en:{title:"DOWN 100 FLOORS", start:"SPACE / TAP to start", how:"← → move · land to heal · avoid spikes",
+      floor:"FLOOR", best:"BEST", over:"GAME OVER", retry:"SPACE / TAP to retry", hp:"HP",
+      reached:"You reached floor", floors:"", share:"Share score", copied:"Copied ✓",
+      tip:"NEW BEST! Buy the dev a coffee →", shareText:(f,u)=>`I reached floor ${f} in Down 100 Floors while my agent was working 🕹️ ${u}?ref=share`}
+}[CFG.lang === "en" ? "en" : "zh"];
+
+function emit(type, data){ /* event contract: game_over / floor / session_start */
+  try{ parent.postMessage({arcade:true, game:"tower100", type, data}, "*"); }catch(e){}
+}
+
+/* ---------------- [CORE] pure logic ---------------- */
+const W=480, H=640, CEIL=54;               // ceiling spike line
+const PLAT={NORMAL:0, SPIKE:1, SPRING:2, CONV_L:3, CONV_R:4, FRAGILE:5};
+
+function makeRng(seed){ let s=seed>>>0; return ()=>((s=(s*1664525+1013904223)>>>0)/4294967296); }
+
+function newGame(seed){
+  return {
+    rng: makeRng(seed||((Date.now()&0xffff)^0x5eed)),
+    px:W/2-12, py:120, vx:0, vy:0, pw:24, ph:28,
+    hp:10, hpMax:10, inv:0,               // invincible frames after damage
+    floor:0, scroll:0, speed:1.05,        // upward scroll px/frame
+    plats:[], nextY:H-40, onPlat:null,
+    t:0, shake:0, over:false, dead:"",
+  };
+}
+function spawnPlat(g, y){
+  const r=g.rng(); let type=PLAT.NORMAL;
+  if(g.floor>4){                           // first floors are safe
+    if(r<0.11) type=PLAT.SPIKE;
+    else if(r<0.19) type=PLAT.SPRING;
+    else if(r<0.27) type=g.rng()<0.5?PLAT.CONV_L:PLAT.CONV_R;
+    else if(r<0.34) type=PLAT.FRAGILE;
+  }
+  const w=type===PLAT.SPRING?72:96;
+  g.plats.push({x:24+g.rng()*(W-48-w), y, w, h:14, type, hits:0, id:g.floor+1});
+}
+function step(g, input){
+  if(g.over) return;
+  g.t++;
+  // difficulty curve: speed rises with depth, caps at 3.2
+  g.speed=Math.min(3.2, 1.05+g.floor*0.022);
+  // spawn platforms ~92px apart, from below
+  while(g.nextY < H - g.scroll + 120){ spawnPlat(g, g.nextY); g.nextY+=92; }
+  g.scroll+=g.speed;
+
+  // horizontal control
+  const ACC=0.55, FRI=0.86, MAXV=4.6;
+  if(input.left)  g.vx-=ACC;
+  if(input.right) g.vx+=ACC;
+  g.vx*=FRI; g.vx=Math.max(-MAXV,Math.min(MAXV,g.vx));
+  g.px+=g.vx;
+  g.px=Math.max(4,Math.min(W-4-g.pw,g.px));
+
+  // gravity
+  g.vy=Math.min(7.5, g.vy+0.34);
+  g.py+=g.vy;
+
+  // platform collision (player falls onto top surface)
+  g.onPlat=null;
+  for(const p of g.plats){
+    const sy=p.y-g.scroll;
+    if(g.vy>=0 && g.py+g.ph>=sy && g.py+g.ph<=sy+p.h+g.vy+1 &&
+       g.px+g.pw>p.x+4 && g.px<p.x+p.w-4){
+      if(p.type===PLAT.FRAGILE && p.hits>18){ continue; }   // broken
+      g.py=sy-g.ph; g.vy=0; g.onPlat=p;
+      if(!p.counted){ p.counted=true;
+        if(p.id>g.floor){ g.floor=p.id; emit("floor",{floor:g.floor}); }
+        if(p.type!==PLAT.SPIKE && g.hp<g.hpMax) g.hp++;      // classic heal-on-land
+      }
+      if(p.type===PLAT.SPIKE && g.inv<=0){ damage(g,2); }
+      if(p.type===PLAT.SPRING){ g.vy=-9.5; g.onPlat=null; }
+      if(p.type===PLAT.CONV_L) g.px-=1.6;
+      if(p.type===PLAT.CONV_R) g.px+=1.6;
+      if(p.type===PLAT.FRAGILE){ p.hits++; if(p.hits>18) g.onPlat=null; }
+    }
+  }
+  // riding a platform means moving up with the scroll
+  if(g.onPlat) g.py=g.onPlat.y-g.scroll-g.ph;
+
+  // ceiling spikes
+  if(g.py<CEIL){ g.py=CEIL; g.vy=1.5; if(g.inv<=0) damage(g,3); }
+  // fell off the bottom
+  if(g.py>H+10){ g.hp=0; g.dead="fall"; }
+
+  if(g.inv>0) g.inv--;
+  if(g.shake>0) g.shake--;
+  g.plats=g.plats.filter(p=>p.y-g.scroll>-30);
+
+  if(g.hp<=0 && !g.over){ g.over=true; emit("game_over",{floor:g.floor, cause:g.dead||"hp"}); }
+}
+function damage(g,n){ g.hp-=n; g.inv=45; g.shake=10; }
+
+/* ---------------- [WEB] browser adapter ---------------- */
+const cv=document.getElementById("game"), cx=cv.getContext("2d");
+cx.imageSmoothingEnabled=false;
+// responsive scale
+function fit(){ const s=Math.min(innerWidth/W,(innerHeight-70)/H,1.4);
+  cv.style.width=(W*s|0)+"px"; cv.style.height=(H*s|0)+"px"; }
+addEventListener("resize",fit); fit();
+
+const store={
+  get best(){ try{return +localStorage.getItem("arcade.tower100.best")||0}catch(e){return 0} },
+  set best(v){ try{localStorage.setItem("arcade.tower100.best",v)}catch(e){} }
+};
+
+let mode="menu", g=newGame(), input={left:false,right:false};
+const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+addEventListener("keydown",e=>{
+  if(e.code==="ArrowLeft"||e.code==="KeyA") input.left=true;
+  if(e.code==="ArrowRight"||e.code==="KeyD") input.right=true;
+  if(e.code==="Space"||e.code==="Enter"){ e.preventDefault(); action(); }
+});
+addEventListener("keyup",e=>{
+  if(e.code==="ArrowLeft"||e.code==="KeyA") input.left=false;
+  if(e.code==="ArrowRight"||e.code==="KeyD") input.right=false;
+});
+cv.addEventListener("pointerdown",e=>{
+  if(mode!=="play"){ action(); return; }
+  const r=cv.getBoundingClientRect();
+  ((e.clientX-r.left)/r.width<0.5)?input.left=true:input.right=true;
+});
+addEventListener("pointerup",()=>{ input.left=input.right=false; });
+
+function action(){
+  if(mode==="menu"||mode==="over"){
+    if(mode==="over"){ hideAd(); hideMeta(); }
+    g=newGame(); mode="play"; emit("session_start",{});
+  }
+}
+
+/* ---- game-over meta row: share always, tip only on NEW BEST ---- */
+const meta=document.getElementById("meta-row");
+function showMeta(){
+  meta.innerHTML="";
+  if(CFG.share&&CFG.share.enabled&&CFG.share.url){
+    const b=document.createElement("button"); b.textContent=T.share;
+    b.onclick=(e)=>{ e.stopPropagation();
+      const txt=T.shareText(g.floor,CFG.share.url);
+      const done=()=>{ b.textContent=T.copied; setTimeout(()=>b.textContent=T.share,1500);
+        emit("share",{floor:g.floor}); };
+      if(navigator.clipboard&&navigator.clipboard.writeText)
+        navigator.clipboard.writeText(txt).then(done,()=>fallbackCopy(txt,done));
+      else fallbackCopy(txt,done);
+    };
+    meta.appendChild(b);
+  }
+  if(g.newBest&&CFG.tips&&CFG.tips.enabled&&CFG.tips.url){
+    const a=document.createElement("a"); a.id="tip-link"; a.textContent=T.tip;
+    a.href=CFG.tips.url; a.target="_blank"; a.rel="noopener";
+    a.onclick=()=>emit("tip_click",{floor:g.floor});
+    meta.appendChild(a);
+  }
+  if(meta.children.length) meta.classList.add("on");
+}
+function hideMeta(){ meta.classList.remove("on"); meta.innerHTML=""; }
+function fallbackCopy(txt,done){
+  const ta=document.createElement("textarea"); ta.value=txt; ta.style.position="fixed";
+  ta.style.opacity="0"; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){}
+  ta.remove();
+}
+
+/* palette */
+const C={shaft:"#151329", shaft2:"#1c1a38", wall:"#7d4630", wallD:"#5c3222", wallHi:"#96593c",
+  ink:"#efe6d0", dim:"#8d86a8", amber:"#e8a33d", amberD:"#b57a24", danger:"#d95757",
+  spring:"#5fd08a", conv:"#7fa7e8", frag:"#a89778", player:"#f2ede1", playerD:"#c9c2b2"};
+
+function px(x,y,w,h,c){ cx.fillStyle=c; cx.fillRect(x|0,y|0,w|0,h|0); }
+
+function drawWalls(off){
+  px(0,0,W,H,C.shaft);
+  // parallax brick shafts on both sides
+  for(const side of [0,W-20]){
+    px(side,0,20,H,C.wall);
+    cx.fillStyle=C.wallD;
+    for(let y=-(off%32);y<H;y+=32){ cx.fillRect(side,y,20,3); cx.fillRect(side+(y/32&1?0:10),y+16,10,3); }
+    px(side===0?18:W-20,0,2,H,C.wallHi);
+  }
+  // faint depth stripes
+  cx.fillStyle=C.shaft2;
+  for(let y=-(off*0.4%160);y<H;y+=160) cx.fillRect(20,y,W-40,60);
+}
+function drawCeiling(){
+  px(20,0,W-40,CEIL-14,C.wallD);
+  cx.fillStyle=C.danger;
+  for(let x=20;x<W-20;x+=16){ cx.beginPath();
+    cx.moveTo(x,CEIL-14); cx.lineTo(x+8,CEIL); cx.lineTo(x+16,CEIL-14); cx.fill(); }
+}
+function drawPlat(p){
+  const y=p.y-g.scroll; if(y<CEIL-20||y>H+20) return;
+  if(p.type===PLAT.FRAGILE && p.hits>18) return;
+  const base = p.type===PLAT.SPIKE?C.danger : p.type===PLAT.SPRING?C.spring :
+    (p.type===PLAT.CONV_L||p.type===PLAT.CONV_R)?C.conv :
+    p.type===PLAT.FRAGILE?C.frag : C.amber;
+  px(p.x,y,p.w,p.h,base);
+  px(p.x,y+p.h-4,p.w,4,p.type===PLAT.NORMAL?C.amberD:"rgba(0,0,0,.28)");
+  if(p.type===PLAT.SPIKE){ cx.fillStyle="#f0dede";
+    for(let x=p.x+4;x<p.x+p.w-8;x+=12){ cx.beginPath();
+      cx.moveTo(x,y); cx.lineTo(x+6,y-8); cx.lineTo(x+12,y); cx.fill(); } }
+  if(p.type===PLAT.SPRING){ px(p.x+p.w/2-10,y-5,20,5,"#dff5e6"); }
+  if(p.type===PLAT.CONV_L||p.type===PLAT.CONV_R){ cx.fillStyle="rgba(255,255,255,.75)";
+    const d=p.type===PLAT.CONV_R?1:-1, ph=(g.t*2*d)%16;
+    for(let x=p.x+((ph+16)%16);x<p.x+p.w-6;x+=16) cx.fillRect(x,y+4,6,2); }
+  if(p.type===PLAT.FRAGILE && p.hits>0){ cx.fillStyle="rgba(0,0,0,.5)";
+    cx.fillRect(p.x+p.w*0.3,y,2,p.h); cx.fillRect(p.x+p.w*0.6,y+3,2,p.h-3); }
+}
+function drawPlayer(){
+  if(g.inv>0 && (g.t>>2)%2) return;        // damage blink
+  const x=g.px,y=g.py;
+  px(x,y+6,g.pw,g.ph-6,C.player);          // body
+  px(x+3,y,g.pw-6,10,C.player);            // head
+  px(x+5,y+3,4,4,"#2a2640"); px(x+g.pw-9,y+3,4,4,"#2a2640"); // eyes
+  px(x,y+g.ph-4,8,4,C.playerD); px(x+g.pw-8,y+g.ph-4,8,4,C.playerD); // feet
+}
+function text(s,x,y,size,c,align){ cx.fillStyle=c; cx.font=`bold ${size}px ui-monospace,Menlo,monospace`;
+  cx.textAlign=align||"center"; cx.fillText(s,x,y); }
+
+function drawHud(){
+  // floor counter — the signature: a huge depth number living in the shaft
+  text(String(g.floor),W/2,116,64,"rgba(239,230,208,.16)");
+  text(`${T.floor} ${g.floor}`,30,34,16,C.ink,"left");
+  text(`${T.best} ${Math.max(store.best,g.floor)}`,W-30,34,14,C.dim,"right");
+  // hp blocks
+  for(let i=0;i<g.hpMax;i++) px(30+i*16,44,12,8,i<g.hp?(g.hp<=3?C.danger:C.spring):"rgba(255,255,255,.12)");
+}
+function drawMenu(){
+  drawWalls(performance.now()/40); drawCeiling();
+  text(T.title,W/2,230,CFG.lang==="en"?30:36,C.amber);
+  text("100",W/2,340,110,"rgba(232,163,61,.25)");
+  text(T.how,W/2,420,15,C.dim);
+  if((performance.now()/500|0)%2) text(T.start,W/2,480,18,C.ink);
+  text(`${T.best} ${store.best}`,W/2,530,14,C.dim);
+}
+function drawOver(){
+  cx.fillStyle="rgba(12,10,26,.78)"; cx.fillRect(0,0,W,H);
+  text(T.over,W/2,250,40,C.danger);
+  text(`${T.reached} ${g.floor} ${T.floors}`.trim(),W/2,310,20,C.ink);
+  if(g.newBest&&g.floor>0) text("★ NEW BEST ★",W/2,345,16,C.amber);
+  if((performance.now()/500|0)%2) text(T.retry,W/2,420,16,C.ink);
+}
+
+function loop(){
+  if(mode==="play"){
+    step(g,input);
+    const sh=(!reduceMotion&&g.shake>0)?(Math.random()*6-3):0;
+    cx.save(); cx.translate(sh,sh*0.6);
+    drawWalls(g.scroll); for(const p of g.plats) drawPlat(p);
+    drawCeiling(); drawPlayer(); drawHud();
+    cx.restore();
+    if(g.over){ mode="over";
+      g.newBest = g.floor>store.best;
+      if(g.newBest) store.best=g.floor;
+      showAd(); showMeta(); }
+  } else if(mode==="menu"){ drawMenu(); }
+  else if(mode==="over"){
+    drawWalls(g.scroll); for(const p of g.plats) drawPlat(p);
+    drawCeiling(); drawHud(); drawOver();
+  }
+  requestAnimationFrame(loop);
+}
+loop();
+
+/* ---- ads: driven entirely by injected config; off by default ---- */
+const slot=document.getElementById("ad-slot"); let adLoaded=false;
+function showAd(){
+  if(!CFG.ads||!CFG.ads.enabled||CFG.pro) return;
+  slot.classList.add("on");
+  if(!adLoaded && CFG.ads.client_id){
+    adLoaded=true;
+    const s=document.createElement("script"); s.async=true;
+    s.src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client="+CFG.ads.client_id;
+    s.crossOrigin="anonymous"; document.head.appendChild(s);
+    slot.innerHTML=`<ins class="adsbygoogle" style="display:block" data-ad-client="${CFG.ads.client_id}"
+      data-ad-slot="${(CFG.ads.slots&&CFG.ads.slots.game_over)||""}" data-ad-format="auto"></ins>`;
+    s.onload=()=>{ try{(adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){} };
+  }
+}
+function hideAd(){ slot.classList.remove("on"); }
+</script>
+</body>
+</html>

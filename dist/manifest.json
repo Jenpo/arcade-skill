@@ -1,0 +1,48 @@
+{
+  "schema_version": 2,
+  "manifest_version": "2026.07.10-2237",
+  "min_loader_version": "1.0.0",
+  "kill_switch": false,
+  "notice": {
+    "zh": "",
+    "en": ""
+  },
+  "monetization": {
+    "tips": {
+      "enabled": true,
+      "url": "https://github.com/sponsors/Jenpo"
+    },
+    "share": {
+      "enabled": true,
+      "url": "https://arcade.fxpeek.com"
+    },
+    "ads": {
+      "enabled": false,
+      "provider": "adsense",
+      "client_id": "",
+      "slots": {
+        "game_over": ""
+      }
+    },
+    "pro": {
+      "enabled": false,
+      "stripe_payment_link": "",
+      "license_pubkey": ""
+    }
+  },
+  "games": [
+    {
+      "id": "tower100",
+      "title": {
+        "zh": "是男人就下100层",
+        "en": "Down 100 Floors"
+      },
+      "version": "1.1.1",
+      "entry": "https://arcade.fxpeek.com/bundles/tower100-1.1.1.html",
+      "sha256": "de833dcee0f7c382d99f0b56e49f58531dd73d67b9775386fdd6a8558481cd29",
+      "size_kb": 14.6,
+      "tier": "free",
+      "min_loader_version": "1.0.0"
+    }
+  ]
+}
