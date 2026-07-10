@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Play Down 100 Floors · Arcade Skill</title>
+<style>
+  :root{--bg:#10121f;--panel:#171a29;--line:#343b4f;--ink:#f2ead8;--muted:#aab2c8;--accent:#e8a33d}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  main{min-height:100vh;display:grid;grid-template-rows:auto 1fr auto;gap:14px;padding:18px}
+  header,footer{max-width:980px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{font-weight:800}.muted{color:var(--muted)}
+  .shell{max-width:980px;width:100%;margin:0 auto;display:grid;grid-template-columns:minmax(320px,520px) minmax(240px,1fr);gap:18px;align-items:start}
+  iframe{width:100%;aspect-ratio:480/640;border:1px solid var(--line);border-radius:8px;background:#151329;box-shadow:0 22px 70px rgba(0,0,0,.38)}
+  aside{border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:18px}
+  h1{font-size:30px;line-height:1.05;margin:0 0 10px}p{margin:0 0 14px;color:var(--muted)}
+  a{color:var(--accent);text-decoration:none}.btn{display:inline-flex;border:1px solid var(--accent);border-radius:999px;padding:8px 12px;color:var(--accent);font-weight:700}
+  .ad-slot{min-height:250px;border:1px dashed var(--line);border-radius:8px;display:grid;place-items:center;color:#697186;margin-top:14px}
+  @media(max-width:820px){.shell{grid-template-columns:1fr}header,footer{align-items:flex-start;flex-direction:column}main{padding:12px}}
+</style>
+<main>
+  <header>
+    <div class="brand">Arcade Skill</div>
+    <div class="muted">Hosted play surface · ads-ready later</div>
+  </header>
+  <section class="shell">
+    <iframe id="game" title="Down 100 Floors" allow="clipboard-write"></iframe>
+    <aside>
+      <h1>Down 100 Floors</h1>
+      <p>An old web arcade break for the age of coding agents. Move left and right, land on platforms, dodge spikes, and see how deep you can fall.</p>
+      <p>Controls: arrow keys, A/D, or tap the left/right half of the game.</p>
+      <a class="btn" href="https://github.com/Jenpo/arcade-skill">Install as a skill</a>
+      <div class="ad-slot">Ad slot reserved for hosted web only</div>
+    </aside>
+  </section>
+  <footer>
+    <span class="muted">No paid health. No paid revives. Ranked play stays fair.</span>
+    <a href="/docs/project-intro.md">Project intro</a>
+  </footer>
+</main>
+<script>
+const cfg = {
+  lang: new URLSearchParams(location.search).get("lang") === "zh" ? "zh" : "en",
+  source: "hosted",
+  ads: {enabled: false},
+  pro: false,
+  tips: {enabled: true, url: "https://github.com/sponsors/Jenpo"},
+  share: {enabled: true, url: "https://arcade.fxpeek.com/play"},
+  telemetry: {enabled: false, endpoint: "https://arcade.fxpeek.com/api/event", sample_rate: 1}
+};
+const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
+document.getElementById("game").src = "/bundles/tower100-1.3.0.html?cfg=" + encoded;
+</script>
+</html>

@@ -82,6 +82,17 @@ docs/             screenshots, language intros, launch copy
 4. GitHub Actions rebuilds `dist/` and deploys Pages.
 5. Installed users receive the new bundle on next launch.
 
+Optional manifest signing:
+
+```bash
+python3 -m pip install pynacl
+python3 scripts/manifest_keygen.py
+ARCADE_MANIFEST_SIGNING_KEY=... python3 scripts/build_manifest.py
+```
+
+Keep the signing key on the release runner only. Burn the public key into the
+loader when you are ready to enforce manifest signatures.
+
 ## Roadmap
 
 - [x] M1: Down 100 Floors + hot-update loader

@@ -4,7 +4,7 @@
 Release flow = edit games/*/ + bump VERSIONS + git push. CI runs this and
 deploys dist/ to GitHub Pages. Nothing else to do.
 """
-import hashlib, json, shutil, sys, time
+import base64, hashlib, json, os, shutil, sys, time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -15,9 +15,10 @@ DOCS = ROOT / "docs"
 # ---- release registry: bump a version here to ship a new build ----
 BASE_URL = "https://arcade.fxpeek.com"       # owned domain; CNAME → GitHub Pages
 CUSTOM_DOMAIN = "arcade.fxpeek.com"          # written to dist/CNAME for Pages
+SIGNING_KEY_B64 = os.environ.get("ARCADE_MANIFEST_SIGNING_KEY", "")
 VERSIONS = {
     "tower100": {
-        "version": "1.2.0",
+        "version": "1.3.0",
         "src": ROOT / "games/tower100/tower100.html",
         "title": {"zh": "是男人就下100层", "en": "Down 100 Floors"},
         "tier": "free",
@@ -30,7 +31,7 @@ MONETIZATION = {
     },
     "share": {
         "enabled": True,
-        "url": "https://arcade.fxpeek.com",   # hosted landing for shared scores (?ref=share)
+        "url": "https://arcade.fxpeek.com/play",   # hosted play/share landing (?ref=share)
     },
     "ads": {
         "enabled": False,                 # <— THE ad switch. flip + push = live.
@@ -53,6 +54,21 @@ MONETIZATION = {
 
 def sha256_file(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def maybe_sign_manifest(manifest_path: Path):
+    if not SIGNING_KEY_B64:
+        sig = manifest_path.with_suffix(manifest_path.suffix + ".sig")
+        sig.unlink(missing_ok=True)
+        return
+    try:
+        from nacl.signing import SigningKey
+    except ImportError:
+        sys.exit("ARCADE_MANIFEST_SIGNING_KEY is set but PyNaCl is not installed")
+    key = SigningKey(base64.b64decode(SIGNING_KEY_B64))
+    sig = key.sign(manifest_path.read_bytes()).signature
+    manifest_path.with_suffix(manifest_path.suffix + ".sig").write_text(
+        base64.b64encode(sig).decode() + "\n", encoding="utf-8")
 
 
 def main():
@@ -89,8 +105,10 @@ def main():
         "monetization": MONETIZATION,
         "games": games,
     }
-    (DIST / "manifest.json").write_text(
+    manifest_path = DIST / "manifest.json"
+    manifest_path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    maybe_sign_manifest(manifest_path)
     (DIST / "CNAME").write_text(CUSTOM_DOMAIN + "\n", encoding="utf-8")
     if DOCS.exists():
         docs_out = DIST / "docs"
@@ -100,6 +118,12 @@ def main():
         landing = DOCS / "landing.html"
         if landing.exists():
             shutil.copy2(landing, DIST / "index.html")
+        play = DOCS / "play.html"
+        if play.exists():
+            play_dir = DIST / "play"
+            play_dir.mkdir(exist_ok=True)
+            shutil.copy2(play, play_dir / "index.html")
+            shutil.copy2(play, DIST / "play.html")
     print(f"manifest {manifest['manifest_version']} → dist/manifest.json  (CNAME: {CUSTOM_DOMAIN})")
 
 

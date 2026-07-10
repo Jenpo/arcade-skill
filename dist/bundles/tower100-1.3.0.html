@@ -62,14 +62,16 @@ const T = {
   zh:{title:"是男人就下100层", start:"按 空格 / 点击 开始", how:"← → 移动 · 落在平台上回血 · 别碰刺",
       floor:"层", best:"最佳", over:"游戏结束", retry:"空格 / 点击 再来一局", hp:"血量",
       reached:"你下到了第", floors:"层", share:"分享战绩", copied:"已复制 ✓",
+      pause:"已暂停", resume:"按 P / 点击 继续", recap:(f)=>`全服占位数据: 62% 的玩家倒在 ${Math.max(10,Math.ceil(f/10)*10)} 层前`,
       tip:"NEW BEST! 请作者喝杯咖啡 →", shareText:(f,u)=>`我在《是男人就下100层》摸鱼下到了第 ${f} 层 🕹️ ${u}?ref=share`},
   en:{title:"DOWN 100 FLOORS", start:"SPACE / TAP to start", how:"← → move · land to heal · avoid spikes",
       floor:"FLOOR", best:"BEST", over:"GAME OVER", retry:"SPACE / TAP to retry", hp:"HP",
       reached:"You reached floor", floors:"", share:"Share score", copied:"Copied ✓",
+      pause:"PAUSED", resume:"P / TAP to resume", recap:(f)=>`Placeholder stat: 62% of players fall before floor ${Math.max(10,Math.ceil(f/10)*10)}`,
       tip:"NEW BEST! Buy the dev a coffee →", shareText:(f,u)=>`I reached floor ${f} in Down 100 Floors while my agent was working 🕹️ ${u}?ref=share`}
 }[CFG.lang === "en" ? "en" : "zh"];
 
-const GAME_VERSION = "1.2.0";
+const GAME_VERSION = "1.3.0";
 const SESSION_ID = (() => {
   try{ const a=new Uint32Array(2); crypto.getRandomValues(a); return [...a].map(x=>x.toString(16)).join(""); }
   catch(e){ return String(Date.now()) + Math.random().toString(16).slice(2); }
@@ -153,6 +155,7 @@ function step(g, input){
       g.py=sy-g.ph; g.vy=0; g.onPlat=p;
       if(!p.counted){ p.counted=true;
         if(p.id>g.floor){ g.floor=p.id; if(g.floor===1 || g.floor%5===0) emit("floor",{floor:g.floor}); }
+        beep("land");
         if(p.type!==PLAT.SPIKE && g.hp<g.hpMax) g.hp++;      // classic heal-on-land
       }
       if(p.type===PLAT.SPIKE && g.inv<=0){ damage(g,2); }
@@ -176,7 +179,7 @@ function step(g, input){
 
   if(g.hp<=0 && !g.over){ g.over=true; emit("game_over",{floor:g.floor, cause:g.dead||"hp"}); }
 }
-function damage(g,n){ g.hp-=n; g.inv=45; g.shake=10; }
+function damage(g,n){ g.hp-=n; g.inv=45; g.shake=10; beep("hurt"); }
 
 /* ---------------- [WEB] browser adapter ---------------- */
 const cv=document.getElementById("game"), cx=cv.getContext("2d");
@@ -191,30 +194,54 @@ const store={
   set best(v){ try{localStorage.setItem("arcade.tower100.best",v)}catch(e){} }
 };
 
-let mode="menu", g=newGame(), input={left:false,right:false};
+let mode="menu", g=newGame(), input={left:false,right:false}, pauseFrom="user";
 const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let audioCtx=null;
+
+function beep(kind){
+  try{
+    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==="suspended") audioCtx.resume();
+    const o=audioCtx.createOscillator(), gain=audioCtx.createGain();
+    const now=audioCtx.currentTime;
+    const spec = kind==="hurt" ? [110,.12,.06,"square"] :
+      kind==="over" ? [75,.32,.08,"sawtooth"] : [520,.07,.04,"square"];
+    o.type=spec[3]; o.frequency.setValueAtTime(spec[0], now);
+    gain.gain.setValueAtTime(spec[2], now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now+spec[1]);
+    o.connect(gain); gain.connect(audioCtx.destination); o.start(now); o.stop(now+spec[1]);
+  }catch(e){}
+}
 
 addEventListener("keydown",e=>{
   if(e.code==="ArrowLeft"||e.code==="KeyA") input.left=true;
   if(e.code==="ArrowRight"||e.code==="KeyD") input.right=true;
   if(e.code==="Space"||e.code==="Enter"){ e.preventDefault(); action(); }
+  if(e.code==="KeyP"){ e.preventDefault(); togglePause("user"); }
 });
 addEventListener("keyup",e=>{
   if(e.code==="ArrowLeft"||e.code==="KeyA") input.left=false;
   if(e.code==="ArrowRight"||e.code==="KeyD") input.right=false;
 });
 cv.addEventListener("pointerdown",e=>{
+  if(mode==="pause"){ togglePause("tap"); return; }
   if(mode!=="play"){ action(); return; }
   const r=cv.getBoundingClientRect();
   ((e.clientX-r.left)/r.width<0.5)?input.left=true:input.right=true;
 });
 addEventListener("pointerup",()=>{ input.left=input.right=false; });
+addEventListener("blur",()=>{ if(mode==="play") pause("blur"); });
 
 function action(){
   if(mode==="menu"||mode==="over"){
     if(mode==="over"){ hideAd(); hideMeta(); }
-    g=newGame(); mode="play"; emit("session_start",{});
+    g=newGame(); mode="play"; beep("land"); emit("session_start",{});
   }
+}
+function pause(reason){ pauseFrom=reason||"user"; mode="pause"; emit("pause",{reason:pauseFrom,floor:g.floor}); }
+function togglePause(reason){
+  if(mode==="play") pause(reason);
+  else if(mode==="pause"){ mode="play"; beep("land"); emit("resume",{reason:reason||pauseFrom,floor:g.floor}); }
 }
 
 /* ---- game-over meta row: share always, tip only on NEW BEST ---- */
@@ -329,7 +356,13 @@ function drawOver(){
   text(T.over,W/2,250,40,C.danger);
   text(`${T.reached} ${g.floor} ${T.floors}`.trim(),W/2,310,20,C.ink);
   if(g.newBest&&g.floor>0) text("★ NEW BEST ★",W/2,345,16,C.amber);
+  text(T.recap(g.floor),W/2,375,13,C.dim);
   if((performance.now()/500|0)%2) text(T.retry,W/2,420,16,C.ink);
+}
+function drawPause(){
+  cx.fillStyle="rgba(12,10,26,.78)"; cx.fillRect(0,0,W,H);
+  text(T.pause,W/2,292,42,C.amber);
+  text(T.resume,W/2,344,16,C.ink);
 }
 
 function loop(){
@@ -341,10 +374,15 @@ function loop(){
     drawCeiling(); drawPlayer(); drawHud();
     cx.restore();
     if(g.over){ mode="over";
+      beep("over");
       g.newBest = g.floor>store.best;
       if(g.newBest) store.best=g.floor;
       showAd(); showMeta(); }
   } else if(mode==="menu"){ drawMenu(); }
+  else if(mode==="pause"){
+    drawWalls(g.scroll); for(const p of g.plats) drawPlat(p);
+    drawCeiling(); drawPlayer(); drawHud(); drawPause();
+  }
   else if(mode==="over"){
     drawWalls(g.scroll); for(const p of g.plats) drawPlat(p);
     drawCeiling(); drawHud(); drawOver();
