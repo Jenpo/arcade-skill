@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arcade Skill · Agent-era arcade break</title>
+<style>
+  :root{--bg:#f6f3ee;--ink:#202528;--muted:#657076;--line:#d8d1c6;--panel:#fff;--accent:#0f8b6f;--dark:#111827}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  main{max-width:1120px;margin:0 auto;padding:44px 22px 64px}
+  .nav{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:34px}
+  .brand{font-weight:800;font-size:20px}.langs{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  .langs a,.btn{border:1px solid var(--line);border-radius:999px;padding:8px 12px;color:var(--ink);text-decoration:none;background:white}
+  .hero{display:grid;grid-template-columns:1fr;gap:28px}
+  h1{font-size:clamp(40px,7vw,84px);line-height:.96;margin:0;letter-spacing:0}
+  .lead{font-size:22px;max-width:780px;color:#3c4448;margin:20px 0 24px}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:34px}.primary{background:var(--dark);color:white;border-color:var(--dark)}
+  .demo{width:100%;border:1px solid var(--line);border-radius:8px;box-shadow:0 20px 60px rgba(32,37,40,.12);background:white}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px}
+  .card h2{font-size:18px;margin:0 0 8px}.card p{margin:0;color:var(--muted)}
+  .shots{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}.shots img{width:100%;border:1px solid var(--line);border-radius:8px;background:#151329}
+  code{background:#ebe5db;border:1px solid #d7cec0;border-radius:5px;padding:2px 5px}
+  @media(max-width:760px){.nav{align-items:flex-start;flex-direction:column}.grid,.shots{grid-template-columns:1fr}h1{font-size:44px}}
+</style>
+<main>
+  <nav class="nav">
+    <div class="brand">Arcade Skill</div>
+    <div class="langs" aria-label="Language links">
+      <a href="/docs/intro.zh.md">中文</a>
+      <a href="/docs/intro.en.md">English</a>
+      <a href="/docs/intro.fr.md">Français</a>
+      <a href="/docs/intro.it.md">Italiano</a>
+      <a href="/docs/intro.ar.md">العربية</a>
+    </div>
+  </nav>
+  <section class="hero">
+    <div>
+      <h1>Old-school arcade breaks for coding agents.</h1>
+      <p class="lead">When Claude Code, Codex, or another agent is busy compiling,
+      testing, or generating a diff, Arcade Skill opens a tiny nostalgic browser
+      game: local URL, verified bundle, pixel platforms, one more run.</p>
+      <div class="cta">
+        <a class="btn primary" href="https://github.com/Jenpo/arcade-skill">GitHub repo</a>
+        <a class="btn" href="/manifest.json">View manifest</a>
+        <a class="btn" href="/docs/project-intro.md">Project intro</a>
+      </div>
+    </div>
+    <img class="demo" src="/docs/assets/screenshots/codex-claude-demo.svg" alt="Arcade Skill running beside a Codex or Claude session">
+  </section>
+  <section class="grid">
+    <article class="card"><h2>Geeky by design</h2><p>Manifest fetch, sha256 verification, local cache, and a tiny Python launcher.</p></article>
+    <article class="card"><h2>Nostalgic on purpose</h2><p>Flash-era and feature-phone energy: short runs, harsh misses, instant retries.</p></article>
+    <article class="card"><h2>Hot updated</h2><p>New games, sponsor links, ads switches, and kill switches ship through JSON.</p></article>
+  </section>
+  <section class="shots">
+    <img src="/docs/assets/screenshots/tower100-menu.svg" alt="Down 100 Floors menu">
+    <img src="/docs/assets/screenshots/tower100-run.svg" alt="Down 100 Floors gameplay">
+  </section>
+</main>
+</html>

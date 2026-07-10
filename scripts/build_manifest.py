@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DIST = ROOT / "dist"
 BUNDLES = DIST / "bundles"
+DOCS = ROOT / "docs"
 
 # ---- release registry: bump a version here to ship a new build ----
 BASE_URL = "https://arcade.fxpeek.com"       # owned domain; CNAME → GitHub Pages
@@ -86,6 +87,14 @@ def main():
     (DIST / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     (DIST / "CNAME").write_text(CUSTOM_DOMAIN + "\n", encoding="utf-8")
+    if DOCS.exists():
+        docs_out = DIST / "docs"
+        if docs_out.exists():
+            shutil.rmtree(docs_out)
+        shutil.copytree(DOCS, docs_out)
+        landing = DOCS / "landing.html"
+        if landing.exists():
+            shutil.copy2(landing, DIST / "index.html")
     print(f"manifest {manifest['manifest_version']} → dist/manifest.json  (CNAME: {CUSTOM_DOMAIN})")
 
 

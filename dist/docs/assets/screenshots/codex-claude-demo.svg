@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="960" viewBox="0 0 1440 960" role="img" aria-labelledby="title desc">
+  <title id="title">Arcade Skill inside a Codex or Claude workflow</title>
+  <desc id="desc">A product-style demo image showing a coding agent session launching a nostalgic mini game.</desc>
+  <rect width="1440" height="960" fill="#f6f3ee"/>
+  <rect x="42" y="42" width="670" height="876" rx="8" fill="#fff" stroke="#d9d3c8"/>
+  <rect x="42" y="42" width="670" height="56" rx="8" fill="#fbfaf7" stroke="#d9d3c8"/>
+  <circle cx="76" cy="70" r="7" fill="#0f8b6f"/>
+  <text x="96" y="77" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="700" fill="#1f2528">Codex / Claude Code</text>
+  <rect x="564" y="58" width="110" height="26" rx="13" fill="#fff" stroke="#d9d3c8"/>
+  <text x="582" y="76" font-family="Inter,Arial,sans-serif" font-size="13" fill="#667076">agent working</text>
+  <rect x="316" y="132" width="340" height="74" rx="8" fill="#eef8f5" stroke="#bfe3d9"/>
+  <text x="338" y="158" font-family="Inter,Arial,sans-serif" font-size="12" font-weight="700" fill="#667076">USER</text>
+  <text x="338" y="184" font-family="Inter,Arial,sans-serif" font-size="20" fill="#1f2528">Tests are still running. Open a quick game.</text>
+  <rect x="80" y="234" width="382" height="82" rx="8" fill="#fbfaf7" stroke="#d9d3c8"/>
+  <text x="102" y="260" font-family="Inter,Arial,sans-serif" font-size="12" font-weight="700" fill="#667076">AGENT</text>
+  <text x="102" y="286" font-family="Inter,Arial,sans-serif" font-size="20" fill="#1f2528">Launching Down 100 Floors.</text>
+  <rect x="80" y="350" width="548" height="168" rx="8" fill="#111827"/>
+  <text x="104" y="386" font-family="Menlo,Consolas,monospace" font-size="18" fill="#d7f7e9">[arcade] manifest 2026.07.10-1444 from arcade.fxpeek.com</text>
+  <text x="104" y="424" font-family="Menlo,Consolas,monospace" font-size="18" fill="#d7f7e9">[arcade] verified tower100 v1.1.1</text>
+  <text x="104" y="462" font-family="Menlo,Consolas,monospace" font-size="18" fill="#d7f7e9">[arcade] opened local browser session</text>
+  <text x="104" y="500" font-family="Menlo,Consolas,monospace" font-size="18" fill="#f4d06f">[tests] still running...</text>
+  <rect x="80" y="814" width="592" height="54" rx="8" fill="#fff" stroke="#d9d3c8"/>
+  <text x="104" y="848" font-family="Inter,Arial,sans-serif" font-size="20" fill="#42494d">无聊, 来一把下100层</text>
+  <rect x="740" y="42" width="658" height="876" rx="8" fill="#10121f" stroke="#d9d3c8"/>
+  <rect x="740" y="42" width="658" height="56" rx="8" fill="#171a29"/>
+  <circle cx="775" cy="70" r="6" fill="#ff6b6b"/><circle cx="797" cy="70" r="6" fill="#ffd166"/><circle cx="819" cy="70" r="6" fill="#06d6a0"/>
+  <rect x="1040" y="56" width="310" height="28" rx="14" fill="none" stroke="#33394d"/>
+  <text x="1060" y="76" font-family="Menlo,Consolas,monospace" font-size="14" fill="#aab2c8">127.0.0.1:48122 · arcade</text>
+  <rect x="832" y="154" width="480" height="640" fill="#151329" stroke="#5c3222" stroke-width="8"/>
+  <rect x="832" y="154" width="42" height="640" fill="#7d4630"/><rect x="1270" y="154" width="42" height="640" fill="#7d4630"/>
+  <text x="902" y="222" font-family="Menlo,Consolas,monospace" font-size="24" font-weight="900" fill="#e8a33d">FLOOR 28</text>
+  <text x="1192" y="222" font-family="Menlo,Consolas,monospace" font-size="24" font-weight="900" fill="#e8a33d">HP 8</text>
+  <text x="1072" y="304" text-anchor="middle" font-family="Menlo,Consolas,monospace" font-size="34" font-weight="900" fill="#efe6d0">DOWN 100 FLOORS</text>
+  <rect x="1048" y="406" width="48" height="64" fill="#efe6d0"/><rect x="1048" y="406" width="48" height="10" fill="#5fd08a"/>
+  <rect x="922" y="520" width="150" height="22" fill="#a8653c"/><rect x="922" y="520" width="150" height="7" fill="#e8a33d"/>
+  <rect x="1128" y="614" width="128" height="22" fill="#a8653c"/><rect x="1128" y="614" width="128" height="7" fill="#d95757"/>
+  <path d="M1152 614h20l-10-28zM1186 614h20l-10-28zM1220 614h20l-10-28z" fill="#d95757"/>
+  <text x="1070" y="860" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="24" font-weight="700" fill="#f2ead8">Agent-era arcade break</text>
+  <text x="1070" y="890" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="16" fill="#aab2c8">Verified hot updates, local cache, old-school one-more-run energy.</text>
+</svg>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640" role="img" aria-labelledby="title desc">
+  <title id="title">Down 100 Floors start screen</title>
+  <desc id="desc">A nostalgic pixel-style start screen for the Down 100 Floors mini game.</desc>
+  <rect width="960" height="640" fill="#151329"/>
+  <rect x="0" y="0" width="54" height="640" fill="#7d4630"/>
+  <rect x="906" y="0" width="54" height="640" fill="#7d4630"/>
+  <rect x="54" y="0" width="852" height="54" fill="#211d36"/>
+  <g fill="#d95757">
+    <path d="M72 54h28L86 20z"/><path d="M116 54h28l-14-34z"/><path d="M160 54h28l-14-34z"/>
+    <path d="M772 54h28l-14-34z"/><path d="M816 54h28l-14-34z"/><path d="M860 54h28l-14-34z"/>
+  </g>
+  <text x="480" y="148" text-anchor="middle" font-family="Menlo,Consolas,monospace" font-size="52" font-weight="900" fill="#efe6d0">DOWN 100 FLOORS</text>
+  <text x="480" y="204" text-anchor="middle" font-family="Menlo,Consolas,monospace" font-size="28" font-weight="800" fill="#e8a33d">是男人就下100层</text>
+  <text x="480" y="276" text-anchor="middle" font-family="Menlo,Consolas,monospace" font-size="24" fill="#efe6d0">SPACE / TAP TO START</text>
+  <text x="480" y="318" text-anchor="middle" font-family="Menlo,Consolas,monospace" font-size="18" fill="#bfb39a">← → move · land to heal · avoid spikes</text>
+  <rect x="160" y="420" width="200" height="24" fill="#a8653c"/><rect x="160" y="420" width="200" height="7" fill="#e8a33d"/>
+  <rect x="594" y="500" width="172" height="24" fill="#a8653c"/><rect x="594" y="500" width="172" height="7" fill="#e8a33d"/>
+  <rect x="428" y="354" width="48" height="64" fill="#efe6d0"/><rect x="428" y="354" width="48" height="10" fill="#5fd08a"/>
+  <rect x="426" y="418" width="52" height="10" fill="#1a172c"/>
+  <text x="480" y="586" text-anchor="middle" font-family="Menlo,Consolas,monospace" font-size="18" fill="#7f8b9a">arcade.fxpeek.com · hot-updated skill bundle</text>
+</svg>
