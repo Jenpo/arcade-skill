@@ -131,8 +131,15 @@ docs/             screenshots, language intros, launch copy
 1. Edit `games/tower100/tower100.html`.
 2. Bump the version in `scripts/build_manifest.py`.
 3. Push to `main`.
-4. GitHub Actions rebuilds `dist/` and deploys Pages.
-5. Installed users receive the new bundle on next launch.
+4. GitHub Actions rebuilds `dist/` for the repository fallback.
+5. Deploy production:
+
+```bash
+bash scripts/deploy_cloudflare_pages.sh
+```
+
+6. Installed users receive the new bundle on next launch from
+   `https://arcade.fxpeek.com/manifest.json`.
 
 Optional manifest signing:
 
