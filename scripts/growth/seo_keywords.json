@@ -1,0 +1,26 @@
+[
+  {
+    "slug": "games-while-ai-agent-runs-tests",
+    "locale": "en",
+    "title": "Tiny Browser Games While Your AI Agent Runs Tests",
+    "keyword": "games while AI agent runs tests",
+    "datapoint": "Arcade Skill launches from a verified HTML bundle of about 20 KB and keeps ads disabled in localhost sessions.",
+    "intent": "Developers waiting on Codex, Claude Code, npm install, CI, or long local tests."
+  },
+  {
+    "slug": "claude-code-break-game",
+    "locale": "en",
+    "title": "A Retro Break Game For Claude Code Wait Time",
+    "keyword": "Claude Code break game",
+    "datapoint": "The hosted play route is https://arcade.fxpeek.com/play/ and the installed skill uses https://arcade.fxpeek.com/manifest.json for updates.",
+    "intent": "Users who want a harmless local arcade break instead of doom-scrolling during agent waits."
+  },
+  {
+    "slug": "ai-agent-waiting-game-zh",
+    "locale": "zh",
+    "title": "AI Agent 跑测试时玩的复古小游戏",
+    "keyword": "AI agent 跑测试 小游戏",
+    "datapoint": "Arcade Skill 的本地技能壳只负责拉取 manifest、校验 sha256、打开浏览器，游戏本体通过热更新下发。",
+    "intent": "正在等 Codex、Claude Code、依赖安装、测试跑完的开发者。"
+  }
+]

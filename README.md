@@ -82,9 +82,15 @@ More launch copy, screenshots, positioning notes, and gallery assets live in
 
 ## Growth Measurement
 
-Arcade Skill tracks growth through two measurement loops:
+Arcade Skill tracks growth through five measurement and draft loops:
 
-- **P4 Share of Model:** weekly prompt checks across AI engines, scored with
+- **P1 Mention radar:** public HN, Reddit, and GitHub opportunities are scored
+  with `scripts/growth/mention_radar.py`; every reply or PR stays manual.
+- **P2 Scenario page factory:** reviewed SEO/GEO page drafts come from
+  `scripts/growth/seo_page_factory.py`.
+- **P3 Leaderboard digest:** Top 10 rows become bilingual social drafts through
+  `scripts/growth/leaderboard_digest.py`.
+- **P4 Share of Model:** weekly prompt checks across AI engines are scored with
   `scripts/growth/som_tracker.py`.
 - **P5 Telemetry回流:** D1 event summaries from
   `scripts/growth/telemetry_summary.sql` or a Markdown report from
@@ -92,6 +98,15 @@ Arcade Skill tracks growth through two measurement loops:
 
 The public AI context files are `llms.txt` and `ai.txt`. They are generated into
 the production root during `scripts/build_manifest.py`.
+
+One-command local growth smoke test:
+
+```bash
+python3 scripts/growth/mention_radar.py --offline
+python3 scripts/growth/seo_page_factory.py
+python3 scripts/growth/leaderboard_digest.py
+python3 scripts/growth/weekly_growth_report.py
+```
 
 ## Screenshots
 

@@ -12,6 +12,90 @@ The operating rule is strict:
 
 Radar can be automated. Publishing stays human-reviewed.
 
+## Weekly Runbook
+
+```bash
+python3 scripts/growth/mention_radar.py --offline
+python3 scripts/growth/seo_page_factory.py
+python3 scripts/growth/leaderboard_digest.py
+python3 scripts/growth/som_tracker.py init
+python3 scripts/growth/telemetry_report.py
+python3 scripts/growth/weekly_growth_report.py
+```
+
+`--offline` uses bundled sample data for local testing. Remove it when you want
+the radar to fetch public HN, Reddit, and GitHub sources.
+
+## Status Matrix
+
+| Pipeline | Script | Output | Automation boundary |
+| --- | --- | --- | --- |
+| P1 mention radar | `scripts/growth/mention_radar.py` | `growth/radar/radar-latest.md` | Finds opportunities only; replies and PRs are manual. |
+| P2 SEO factory | `scripts/growth/seo_page_factory.py` | `growth/drafts/seo/*/index.html` | Drafts pages only; use `--publish` after review. |
+| P3 leaderboard digest | `scripts/growth/leaderboard_digest.py` | `growth/drafts/leaderboard-latest.md` | Drafts bilingual posts only. |
+| P4 Share of Model | `scripts/growth/som_tracker.py` | `growth/reports/som-latest.md` | Scores approved/exported answers. |
+| P5 telemetry | `scripts/growth/telemetry_report.py` | `growth/reports/telemetry-latest.md` | Reads production D1 metrics. |
+
+## P1: Mention Radar
+
+Use the radar to find moments where a transparent maker reply is relevant:
+developer wait-time threads, Claude/Codex skill lists, awesome repositories, and
+"what do you do while tests run" discussions.
+
+```bash
+python3 scripts/growth/mention_radar.py \
+  --out growth/radar/radar-latest.md
+```
+
+The script reads public sources and scores them into:
+
+- `REPLY_WORTHY`: someone already has the problem; reply as the maker.
+- `LIST_TARGET`: a directory or awesome list may accept a PR.
+- `IGNORE`: weak fit or unsafe context.
+
+No account action is automated.
+
+## P2: Scenario Page Factory
+
+Generate reviewed SEO/GEO page drafts from `scripts/growth/seo_keywords.json`.
+
+```bash
+python3 scripts/growth/seo_page_factory.py
+```
+
+Quality gates:
+
+- at least 600 tokenized words
+- real datapoint present
+- FAQPage schema present
+- maximum Jaccard similarity below 0.40
+
+After human review:
+
+```bash
+python3 scripts/growth/seo_page_factory.py --publish
+python3 scripts/build_manifest.py
+```
+
+## P3: Leaderboard Digest
+
+Before M2 ranking is live, the digest can be tested with the bundled sample:
+
+```bash
+python3 scripts/growth/leaderboard_digest.py
+```
+
+After ranking is wired, pass a production export:
+
+```bash
+python3 scripts/growth/leaderboard_digest.py \
+  --input growth/leaderboard/latest.json \
+  --out growth/drafts/leaderboard-latest.md
+```
+
+The output includes a Top 10 table plus English and Chinese social drafts. It
+must be reviewed for privacy before publishing.
+
 ## P4: Share Of Model
 
 SoM is the weekly GEO KPI. Run a fixed prompt set across target AI engines and
@@ -53,8 +137,11 @@ python3 scripts/growth/telemetry_report.py \
 
 The site publishes:
 
+- `/robots.txt`
+- `/sitemap.xml`
 - `/llms.txt`
 - `/ai.txt`
+- `/about/`
 - `/docs/project-intro.md`
 - multilingual intros under `/docs/intro.*.md`
 

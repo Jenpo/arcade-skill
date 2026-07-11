@@ -13,8 +13,8 @@ BUNDLES = DIST / "bundles"
 DOCS = ROOT / "docs"
 
 # ---- release registry: bump a version here to ship a new build ----
-BASE_URL = "https://arcade.fxpeek.com"       # owned domain; CNAME → GitHub Pages
-CUSTOM_DOMAIN = "arcade.fxpeek.com"          # written to dist/CNAME for Pages
+BASE_URL = "https://arcade.fxpeek.com"       # owned domain; production runs on Cloudflare Pages
+CUSTOM_DOMAIN = "arcade.fxpeek.com"          # kept for GitHub Pages fallback compatibility
 SIGNING_KEY_B64 = os.environ.get("ARCADE_MANIFEST_SIGNING_KEY", "")
 STRIPE_SUPPORT_URL = os.environ.get(
     "ARCADE_STRIPE_SUPPORT_URL", f"{BASE_URL}/support/")
@@ -54,6 +54,22 @@ MONETIZATION = {
     },
 }
 
+STATIC_ROUTES = [
+    "/",
+    "/about/",
+    "/play/",
+    "/support/",
+    "/docs/project-intro.md",
+    "/docs/intro.zh.md",
+    "/docs/intro.en.md",
+    "/docs/intro.fr.md",
+    "/docs/intro.it.md",
+    "/docs/intro.ar.md",
+    "/llms.txt",
+    "/ai.txt",
+    "/manifest.json",
+]
+
 
 def sha256_file(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -86,6 +102,38 @@ def render_html_tree(root: Path):
         rendered = text.replace("__ARCADE_STRIPE_SUPPORT_URL__", STRIPE_SUPPORT_URL)
         if rendered != text:
             path.write_text(rendered, encoding="utf-8")
+
+
+def write_search_files():
+    robots = "\n".join([
+        "User-agent: *",
+        "Allow: /",
+        "",
+        "User-agent: GPTBot",
+        "Allow: /",
+        "",
+        "User-agent: ClaudeBot",
+        "Allow: /",
+        "",
+        "User-agent: PerplexityBot",
+        "Allow: /",
+        "",
+        "Sitemap: https://arcade.fxpeek.com/sitemap.xml",
+        "",
+    ])
+    (DIST / "robots.txt").write_text(robots, encoding="utf-8")
+    today = time.strftime("%Y-%m-%d")
+    urls = "\n".join(
+        f"  <url><loc>{BASE_URL}{route}</loc><lastmod>{today}</lastmod></url>"
+        for route in STATIC_ROUTES
+    )
+    sitemap = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{urls}\n"
+        "</urlset>\n"
+    )
+    (DIST / "sitemap.xml").write_text(sitemap, encoding="utf-8")
 
 
 def main():
@@ -148,10 +196,17 @@ def main():
             support_dir.mkdir(exist_ok=True)
             copy_rendered_doc(support, support_dir / "index.html")
             copy_rendered_doc(support, DIST / "support.html")
+        about = DOCS / "about.html"
+        if about.exists():
+            about_dir = DIST / "about"
+            about_dir.mkdir(exist_ok=True)
+            copy_rendered_doc(about, about_dir / "index.html")
+            copy_rendered_doc(about, DIST / "about.html")
         for name in ["llms.txt", "ai.txt"]:
             src = DOCS / name
             if src.exists():
                 shutil.copy2(src, DIST / name)
+    write_search_files()
     print(f"manifest {manifest['manifest_version']} → dist/manifest.json  (CNAME: {CUSTOM_DOMAIN})")
 
 

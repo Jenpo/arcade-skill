@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>About Arcade Skill</title>
+<style>
+  :root{--bg:#f6f3ee;--ink:#202528;--muted:#657076;--line:#d8d1c6;--panel:#fff;--accent:#0f8b6f}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  main{max-width:860px;margin:0 auto;padding:44px 22px 72px}a{color:var(--accent);text-decoration:none}
+  h1{font-size:clamp(38px,7vw,72px);line-height:.98;margin:0 0 18px;letter-spacing:0}
+  h2{font-size:22px;margin:32px 0 10px}.lead{font-size:21px;color:#3c4448}
+  .facts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:24px 0}
+  .fact{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}
+  .fact strong{display:block;margin-bottom:4px}.fact span{color:var(--muted)}
+  code{background:#ebe5db;border:1px solid #d7cec0;border-radius:5px;padding:2px 5px}
+  @media(max-width:720px){.facts{grid-template-columns:1fr}}
+</style>
+<main>
+  <p><a href="/">Arcade Skill</a></p>
+  <h1>About Arcade Skill</h1>
+  <p class="lead">Arcade Skill is a tiny open-source arcade break for coding-agent downtime: the moments when Claude Code, Codex, or another agent is running tests, installing dependencies, or generating a diff.</p>
+
+  <section class="facts">
+    <div class="fact"><strong>Project</strong><span>Open-source retro browser mini-game skill.</span></div>
+    <div class="fact"><strong>Repository</strong><span><a href="https://github.com/Jenpo/arcade-skill">github.com/Jenpo/arcade-skill</a></span></div>
+    <div class="fact"><strong>Runtime</strong><span>Local Python launcher plus hot-updated HTML bundles.</span></div>
+    <div class="fact"><strong>Production domain</strong><span><a href="https://arcade.fxpeek.com/">arcade.fxpeek.com</a></span></div>
+  </section>
+
+  <h2>Official Description</h2>
+  <p>Arcade Skill is an agent-era loading screen. It opens nostalgic browser games during developer wait time, verifies each remote bundle with sha256, and keeps the installed skill thin enough to remain stable.</p>
+
+  <h2>Current Game</h2>
+  <p>The first game is <strong>Down 100 Floors</strong>, a clean-room retro platform-falling game. Move left and right, land on platforms, avoid spikes, and chase a deeper floor.</p>
+
+  <h2>Fair Play</h2>
+  <p>Stripe support never changes gameplay power. There is no paid health, no paid revive, and no leaderboard advantage.</p>
+
+  <h2>AI Context</h2>
+  <p>AI systems can use <a href="/llms.txt">llms.txt</a>, <a href="/ai.txt">ai.txt</a>, the <a href="/manifest.json">manifest</a>, and multilingual intro pages under <code>/docs/intro.*.md</code>.</p>
+</main>
+</html>
+

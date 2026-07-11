@@ -1,0 +1,9 @@
+{
+  "period": "sample",
+  "mode": "daily",
+  "rows": [
+    {"rank": 1, "player": "JEN", "floor": 88, "elapsed_ms": 114200, "country": "HK"},
+    {"rank": 2, "player": "COD", "floor": 83, "elapsed_ms": 121900, "country": "US"},
+    {"rank": 3, "player": "RET", "floor": 79, "elapsed_ms": 99800, "country": "IT"}
+  ]
+}

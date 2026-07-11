@@ -1,0 +1,37 @@
+{
+  "reply_terms": [
+    "waiting for tests",
+    "waiting for build",
+    "npm install",
+    "pip install",
+    "claude code",
+    "codex",
+    "coding agent",
+    "ai agent",
+    "terminal game",
+    "browser game",
+    "bored while"
+  ],
+  "list_terms": [
+    "awesome",
+    "list",
+    "directory",
+    "resources",
+    "tools",
+    "skills",
+    "claude skills",
+    "codex skills"
+  ],
+  "product_terms": [
+    "arcade skill",
+    "arcade.fxpeek.com",
+    "down 100 floors"
+  ],
+  "negative_terms": [
+    "job",
+    "hiring",
+    "crypto giveaway",
+    "casino",
+    "adult"
+  ]
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "source": "hn",
+    "title": "What do you do while Claude Code is running tests?",
+    "url": "https://news.ycombinator.com/item?id=0",
+    "text": "I keep alt-tabbing while my coding agent installs dependencies and runs long test suites."
+  },
+  {
+    "source": "github",
+    "title": "awesome-codex-tools: add more fun local skills",
+    "url": "https://github.com/example/awesome-codex-tools",
+    "text": "A community list of Codex and Claude skills."
+  },
+  {
+    "source": "reddit",
+    "title": "Hiring frontend engineer for game studio",
+    "url": "https://reddit.com/r/example/comments/0",
+    "text": "We are hiring."
+  }
+]
