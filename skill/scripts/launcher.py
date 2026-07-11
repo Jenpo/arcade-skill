@@ -13,7 +13,7 @@ Offline behaviour: falls back to last cached manifest, then to the seed bundle
 shipped inside the skill package. Ads are forced OFF when offline.
 """
 import argparse, base64, hashlib, hmac, http.server, json, os, shutil, socket
-import socketserver, subprocess, sys, threading, time, urllib.parse, urllib.request, webbrowser
+import socketserver, subprocess, sys, threading, time, urllib.error, urllib.parse, urllib.request, webbrowser
 from pathlib import Path
 
 # ---- the ONLY burned-in values. Use a domain you control forever. ----
@@ -54,8 +54,19 @@ def sha256_file(p: Path) -> str:
 
 def fetch(url: str, timeout=4) -> bytes:
     req = urllib.request.Request(url, headers={"User-Agent": f"arcade-loader/{LOADER_VERSION}"})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return r.read()
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return r.read()
+    except urllib.error.URLError:
+        if urllib.parse.urlparse(url).scheme != "https":
+            raise
+        try:
+            return subprocess.run(
+                ["curl", "-fsSL", "--proto", "=https", "--max-time", str(timeout),
+                 "-A", f"arcade-loader/{LOADER_VERSION}", url],
+                check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout
+        except (FileNotFoundError, subprocess.CalledProcessError) as e:
+            raise urllib.error.URLError(str(e)) from e
 
 
 def validate_entry_url(entry: str) -> str:
