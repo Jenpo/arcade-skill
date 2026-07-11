@@ -61,7 +61,7 @@ const cfg = {
   pro: false,
   tips: {enabled: true, provider: "stripe", url: "https://arcade.fxpeek.com/support/"},
   share: {enabled: true, url: "https://arcade.fxpeek.com/play"},
-  telemetry: {enabled: false, endpoint: "https://arcade.fxpeek.com/api/event", sample_rate: 1}
+  telemetry: {enabled: true, endpoint: "https://telemetry.fxpeek.com/event", sample_rate: 1}
 };
 const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
 document.getElementById("game").src = "/bundles/tower100-1.5.1.html?cfg=" + encoded;

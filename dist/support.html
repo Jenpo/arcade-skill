@@ -12,10 +12,14 @@
   h1{font-size:clamp(32px,7vw,58px);line-height:1;margin:10px 0 16px;letter-spacing:0}
   p{color:var(--muted);margin:0 0 16px}
   .status{border:1px solid var(--line);border-radius:8px;padding:16px;margin:18px 0;background:#111827}
+  .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
+  .fact{border:1px solid var(--line);border-radius:8px;padding:12px;background:#111827}
+  .fact strong{display:block;color:var(--ink);margin-bottom:4px}.fact span{color:var(--muted)}
   .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
   a,.disabled{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:10px 14px;text-decoration:none;font-weight:800}
   a{color:var(--ink)}.primary{background:var(--accent);border-color:var(--accent);color:white}.disabled{color:#737b91}
   code{background:#0f1424;border:1px solid var(--line);border-radius:5px;padding:2px 5px;color:#d8ddff}
+  @media(max-width:720px){.facts{grid-template-columns:1fr}main{padding:22px}}
 </style>
 <main>
   <div class="eyebrow">Stripe support</div>
@@ -23,16 +27,32 @@
   <p>Arcade Skill stays free and ranked play stays fair: no paid health, no paid
   revives, no leaderboard advantage. Stripe support is for people who like the
   weird little developer toy enough to keep it alive.</p>
+  <div class="facts">
+    <div class="fact"><strong>Stripe only</strong><span>Card, Apple Pay, or Google Pay when enabled by Stripe.</span></div>
+    <div class="fact"><strong>No paid power</strong><span>Support never changes health, revives, or ranking rules.</span></div>
+    <div class="fact"><strong>No WeChat/Alipay</strong><span>Those would be a separate China channel, not this skill flow.</span></div>
+  </div>
   <div class="status">
     <p><strong>Stripe checkout status:</strong> the payment link is being connected
     after Stripe finishes account review. The live button will become a
-    <code>buy.stripe.com</code> checkout link through the manifest, without a
+    <code>buy.stripe.com</code> checkout link through release config, without a
     skill reinstall.</p>
   </div>
   <div class="btns">
-    <span class="disabled">Stripe checkout pending</span>
+    <span class="disabled" data-stripe-pending>Stripe checkout pending</span>
     <a href="/play/">Back to game</a>
     <a class="primary" href="https://github.com/Jenpo/arcade-skill">GitHub repo</a>
   </div>
 </main>
+<script>
+const supportUrl = "https://arcade.fxpeek.com/support/";
+if (/^https:\/\/buy\.stripe\.com\//.test(supportUrl)) {
+  const pending = document.querySelector("[data-stripe-pending]");
+  const link = document.createElement("a");
+  link.className = "primary";
+  link.href = supportUrl;
+  link.textContent = "Open Stripe checkout";
+  pending.replaceWith(link);
+}
+</script>
 </html>

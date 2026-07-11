@@ -74,6 +74,20 @@ def maybe_sign_manifest(manifest_path: Path):
         base64.b64encode(sig).decode() + "\n", encoding="utf-8")
 
 
+def copy_rendered_doc(src: Path, dst: Path):
+    text = src.read_text(encoding="utf-8")
+    text = text.replace("__ARCADE_STRIPE_SUPPORT_URL__", STRIPE_SUPPORT_URL)
+    dst.write_text(text, encoding="utf-8")
+
+
+def render_html_tree(root: Path):
+    for path in root.rglob("*.html"):
+        text = path.read_text(encoding="utf-8")
+        rendered = text.replace("__ARCADE_STRIPE_SUPPORT_URL__", STRIPE_SUPPORT_URL)
+        if rendered != text:
+            path.write_text(rendered, encoding="utf-8")
+
+
 def main():
     BUNDLES.mkdir(parents=True, exist_ok=True)
     games = []
@@ -118,6 +132,7 @@ def main():
         if docs_out.exists():
             shutil.rmtree(docs_out)
         shutil.copytree(DOCS, docs_out)
+        render_html_tree(docs_out)
         landing = DOCS / "landing.html"
         if landing.exists():
             shutil.copy2(landing, DIST / "index.html")
@@ -125,14 +140,14 @@ def main():
         if play.exists():
             play_dir = DIST / "play"
             play_dir.mkdir(exist_ok=True)
-            shutil.copy2(play, play_dir / "index.html")
-            shutil.copy2(play, DIST / "play.html")
+            copy_rendered_doc(play, play_dir / "index.html")
+            copy_rendered_doc(play, DIST / "play.html")
         support = DOCS / "support.html"
         if support.exists():
             support_dir = DIST / "support"
             support_dir.mkdir(exist_ok=True)
-            shutil.copy2(support, support_dir / "index.html")
-            shutil.copy2(support, DIST / "support.html")
+            copy_rendered_doc(support, support_dir / "index.html")
+            copy_rendered_doc(support, DIST / "support.html")
     print(f"manifest {manifest['manifest_version']} → dist/manifest.json  (CNAME: {CUSTOM_DOMAIN})")
 
 
