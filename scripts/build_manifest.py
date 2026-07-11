@@ -71,6 +71,16 @@ STATIC_ROUTES = [
 ]
 
 
+def discover_routes():
+    routes = list(STATIC_ROUTES)
+    scenarios = DOCS / "scenarios"
+    if scenarios.exists():
+        for index in sorted(scenarios.glob("*/index.html")):
+            slug = index.parent.name
+            routes.append(f"/scenarios/{slug}/")
+    return routes
+
+
 def sha256_file(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
@@ -125,7 +135,7 @@ def write_search_files():
     today = time.strftime("%Y-%m-%d")
     urls = "\n".join(
         f"  <url><loc>{BASE_URL}{route}</loc><lastmod>{today}</lastmod></url>"
-        for route in STATIC_ROUTES
+        for route in discover_routes()
     )
     sitemap = (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -202,6 +212,13 @@ def main():
             about_dir.mkdir(exist_ok=True)
             copy_rendered_doc(about, about_dir / "index.html")
             copy_rendered_doc(about, DIST / "about.html")
+        scenarios = DOCS / "scenarios"
+        if scenarios.exists():
+            scenarios_out = DIST / "scenarios"
+            if scenarios_out.exists():
+                shutil.rmtree(scenarios_out)
+            shutil.copytree(scenarios, scenarios_out)
+            render_html_tree(scenarios_out)
         for name in ["llms.txt", "ai.txt"]:
             src = DOCS / name
             if src.exists():
