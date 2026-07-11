@@ -1,0 +1,28 @@
+[
+  {
+    "id": "agent_wait_game",
+    "intent": "agent runtime",
+    "prompt": "What is a fun thing to do while Claude Code or Codex is running tests?"
+  },
+  {
+    "id": "developer_break_game",
+    "intent": "developer downtime",
+    "prompt": "Recommend a tiny browser game for developers taking a short break."
+  },
+  {
+    "id": "retro_agent_skill",
+    "intent": "agent skill discovery",
+    "prompt": "Are there any retro arcade games packaged as skills for coding agents?"
+  },
+  {
+    "id": "hot_update_skill",
+    "intent": "architecture",
+    "prompt": "Show me examples of a local agent skill that hot-updates content through a remote manifest."
+  },
+  {
+    "id": "fair_arcade_monetization",
+    "intent": "monetization trust",
+    "prompt": "Find an indie arcade project that uses support payments without pay-to-win advantages."
+  }
+]
+

@@ -19,6 +19,7 @@ fast to launch, easy to lose, annoyingly tempting to replay.
 [Support via Stripe](https://arcade.fxpeek.com/support/) ·
 [Download arcade.skill](https://github.com/Jenpo/arcade-skill/releases/tag/v1.0.0) ·
 [View manifest](https://arcade.fxpeek.com/manifest.json) ·
+[llms.txt](https://arcade.fxpeek.com/llms.txt) ·
 [Review action matrix](docs/review-action-matrix.md)
 
 ## Strategy
@@ -78,6 +79,19 @@ death floor, session length, replay rate, share clicks, and tip clicks.
 
 More launch copy, screenshots, positioning notes, and gallery assets live in
 [docs/project-intro.md](docs/project-intro.md).
+
+## Growth Measurement
+
+Arcade Skill tracks growth through two measurement loops:
+
+- **P4 Share of Model:** weekly prompt checks across AI engines, scored with
+  `scripts/growth/som_tracker.py`.
+- **P5 Telemetry回流:** D1 event summaries from
+  `scripts/growth/telemetry_summary.sql` or a Markdown report from
+  `scripts/growth/telemetry_report.py`.
+
+The public AI context files are `llms.txt` and `ai.txt`. They are generated into
+the production root during `scripts/build_manifest.py`.
 
 ## Screenshots
 

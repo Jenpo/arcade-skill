@@ -148,6 +148,10 @@ def main():
             support_dir.mkdir(exist_ok=True)
             copy_rendered_doc(support, support_dir / "index.html")
             copy_rendered_doc(support, DIST / "support.html")
+        for name in ["llms.txt", "ai.txt"]:
+            src = DOCS / name
+            if src.exists():
+                shutil.copy2(src, DIST / name)
     print(f"manifest {manifest['manifest_version']} → dist/manifest.json  (CNAME: {CUSTOM_DOMAIN})")
 
 
