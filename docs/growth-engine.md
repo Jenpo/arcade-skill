@@ -21,6 +21,15 @@ python3 scripts/growth/growth_smoke.py
 This offline suite is also scheduled in GitHub Actions. It does not touch
 external communities and does not require production credentials.
 
+Production health is separate:
+
+```bash
+python3 scripts/production_health.py
+```
+
+It verifies public pages, sitemap, manifest JSON, Stripe support routing,
+localhost-safe ads flags, and bundle sha256 hashes.
+
 For a live radar pull, run:
 
 ```bash

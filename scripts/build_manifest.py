@@ -61,6 +61,7 @@ STATIC_ROUTES = [
     "/play/",
     "/support/",
     "/docs/project-intro.md",
+    "/docs/DESIGN.md",
     "/docs/intro.zh.md",
     "/docs/intro.en.md",
     "/docs/intro.fr.md",

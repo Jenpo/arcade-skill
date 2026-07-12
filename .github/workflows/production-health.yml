@@ -1,0 +1,16 @@
+name: production-health
+on:
+  schedule:
+    - cron: "47 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check arcade.fxpeek.com
+        run: python3 scripts/production_health.py

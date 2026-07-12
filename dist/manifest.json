@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "manifest_version": "2026.07.12-1021",
+  "manifest_version": "2026.07.12-1035",
   "min_loader_version": "1.0.0",
   "kill_switch": false,
   "notice": {
