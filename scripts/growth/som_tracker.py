@@ -73,8 +73,15 @@ def score_file(src: Path, out: Path):
     rows = load_rows(src)
     if not rows:
         raise SystemExit(f"no rows in {src}")
+    imported = len(rows)
+    observed_rows = [
+        row for row in rows
+        if str(row.get("answer", "")).strip() or any(str(x).strip() for x in row.get("citations", []))
+    ]
+    if not observed_rows:
+        raise SystemExit(f"no observed answers in {src}; refusing to report empty rows as misses")
     scored = []
-    for row in rows:
+    for row in observed_rows:
         mentioned, cited = score_row(row)
         scored.append({**row, "mentioned": mentioned, "cited": cited})
 
@@ -82,6 +89,10 @@ def score_file(src: Path, out: Path):
     mentions = sum(1 for r in scored if r["mentioned"])
     cites = sum(1 for r in scored if r["cited"])
     by_engine = {}
+    imported_by_engine = {}
+    for row in rows:
+        engine = row.get("engine", "unknown")
+        imported_by_engine[engine] = imported_by_engine.get(engine, 0) + 1
     for r in scored:
         bucket = by_engine.setdefault(r.get("engine", "unknown"), [0, 0, 0])
         bucket[0] += 1
@@ -94,21 +105,25 @@ def score_file(src: Path, out: Path):
         "",
         f"Generated: {dt.datetime.now(dt.UTC).strftime('%Y-%m-%dT%H:%M:%SZ')}",
         "",
-        f"- Prompts scored: {total}",
+        f"- Prompts imported: {imported}",
+        f"- Prompts observed: {total} ({total / imported:.1%} coverage)",
         f"- Mention rate: {mentions}/{total} ({mentions / total:.1%})",
         f"- Citation rate: {cites}/{total} ({cites / total:.1%})",
         "",
         "## By Engine",
         "",
-        "| Engine | Rows | Mentions | Citations |",
-        "| --- | ---: | ---: | ---: |",
+        "| Engine | Imported | Observed | Mentions | Citations |",
+        "| --- | ---: | ---: | ---: | ---: |",
     ]
-    for engine, (n, m, c) in sorted(by_engine.items()):
-        lines.append(f"| {engine} | {n} | {m} | {c} |")
+    for engine in sorted(imported_by_engine):
+        n, m, c = by_engine.get(engine, [0, 0, 0])
+        lines.append(f"| {engine} | {imported_by_engine[engine]} | {n} | {m} | {c} |")
     lines.extend(["", "## Misses To Review", ""])
     for r in scored:
         if not r["mentioned"]:
             lines.append(f"- `{r.get('engine','?')}` / `{r.get('prompt_id','?')}`: no mention")
+    unobserved = imported - total
+    lines.extend(["", "## Coverage Gaps", "", f"- Unobserved rows: {unobserved}"])
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(out)
 

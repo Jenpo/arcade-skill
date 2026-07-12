@@ -155,6 +155,9 @@ python3 scripts/growth/som_tracker.py score \
 Fill `growth/som_responses.jsonl` manually or from approved exports. Do not
 auto-post or scrape logged-in answers without review.
 
+The scorer reports coverage separately and refuses to count empty answers as
+misses. A missing engine export is `PENDING`, not a synthetic 0% mention rate.
+
 ## P5: Telemetry回流
 
 Use D1 event data to answer:
