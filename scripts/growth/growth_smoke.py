@@ -23,6 +23,7 @@ def main():
     run(["python3", "scripts/growth/seo_page_factory.py", "--dry-run"])
     run(["python3", "scripts/growth/leaderboard_digest.py", "--out", str(out / "leaderboard.md")])
     run(["python3", "scripts/growth/weekly_growth_report.py", "--out", str(out / "weekly.md")])
+    run(["python3", "scripts/local_llm.py", "design-review", "--input", "docs/scenarios/index.html", "--json"])
     print(f"growth smoke ok: {out}")
 
 

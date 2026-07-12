@@ -21,6 +21,7 @@ fast to launch, easy to lose, annoyingly tempting to replay.
 [View manifest](https://arcade.fxpeek.com/manifest.json) ·
 [llms.txt](https://arcade.fxpeek.com/llms.txt) ·
 [Design notes](docs/DESIGN.md) ·
+[Local LLM policy](docs/local-llm-policy.md) ·
 [Review action matrix](docs/review-action-matrix.md)
 
 ## Strategy
@@ -118,6 +119,19 @@ python3 scripts/production_health.py
 `.github/workflows/production-health.yml` runs the same read-only checks every
 six hours: public routes, sitemap, manifest, Stripe support routing, ads flag,
 and bundle sha256 verification.
+
+## Local LLM Default
+
+Ops tasks are local-first. Use `scripts/local_llm.py` for design review, copy,
+SEO/GEO critique, radar classification, and weekly summaries. It reads the
+local LiteLLM router key from environment variables and never silently falls
+back to a paid API.
+
+```bash
+python3 scripts/local_llm.py design-review --input docs/scenarios/index.html
+```
+
+See [docs/local-llm-policy.md](docs/local-llm-policy.md).
 
 ## Screenshots
 

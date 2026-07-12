@@ -30,6 +30,19 @@ python3 scripts/production_health.py
 It verifies public pages, sitemap, manifest JSON, Stripe support routing,
 localhost-safe ads flags, and bundle sha256 hashes.
 
+## Local LLM Default
+
+Before using a paid API for copy, SEO/GEO review, radar classification, or
+weekly summaries, use the local router:
+
+```bash
+python3 scripts/local_llm.py design-review --input docs/scenarios/index.html
+python3 scripts/local_llm.py seo --input docs/scenarios/games-while-ai-agent-runs-tests/index.html
+```
+
+If the local route is unavailable, record `LOCAL_LLM_PENDING` or
+`LOCAL_LLM_UNAVAILABLE`; do not silently fallback to a paid API.
+
 For a live radar pull, run:
 
 ```bash
