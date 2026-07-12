@@ -3,7 +3,7 @@ const { defineConfig } = require("@playwright/test");
 module.exports = defineConfig({
   testDir: "./tests/visual",
   outputDir: "./growth/reports/visual",
-  snapshotPathTemplate: "{testDir}/../visual-snapshots/{arg}{ext}",
+  snapshotPathTemplate: "{testDir}/../visual-snapshots/{arg}-{platform}{ext}",
   fullyParallel: false,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["line"], ["html", { outputFolder: "growth/reports/visual-html", open: "never" }]] : "line",
