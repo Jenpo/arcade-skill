@@ -10,6 +10,7 @@ import hashlib
 import json
 import ssl
 import sys
+import time
 import urllib.request
 from dataclasses import dataclass
 
@@ -25,6 +26,8 @@ ROUTES = [
     ("/sitemap.xml", "https://arcade.fxpeek.com/scenarios/"),
     ("/llms.txt", "Arcade Skill"),
     ("/ai.txt", "Arcade Skill"),
+    ("/docs/DESIGN.md", "Arcade Skill Design"),
+    ("/docs/awesome-design-md-proposal.md", "Design MD Request"),
 ]
 SCENARIO_ROUTES = [
     "/scenarios/games-while-ai-agent-runs-tests/",
@@ -69,7 +72,7 @@ def check_route(checks, base, route, needle):
         add(checks, f"route {route}", False, str(exc))
 
 
-def check_manifest(checks, base):
+def check_manifest(checks, base, min_manifest_version=""):
     status, _, body = fetch(base + "/manifest.json")
     manifest = json.loads(text(body))
     add(checks, "manifest http", status == 200, f"status={status}")
@@ -77,6 +80,11 @@ def check_manifest(checks, base):
         f"schema_version={manifest.get('schema_version')}")
     add(checks, "kill switch", manifest.get("kill_switch") is False,
         f"kill_switch={manifest.get('kill_switch')}")
+    if min_manifest_version:
+        current = str(manifest.get("manifest_version", ""))
+        add(checks, "manifest version",
+            current >= min_manifest_version,
+            f"current={current} minimum={min_manifest_version}")
 
     monetization = manifest.get("monetization", {})
     tips = monetization.get("tips", {})
@@ -103,14 +111,14 @@ def check_manifest(checks, base):
             add(checks, f"bundle {game.get('id', '?')} sha256", False, str(exc))
 
 
-def run(base):
+def run(base, min_manifest_version=""):
     checks = []
     for route, needle in ROUTES:
         check_route(checks, base, route, needle)
     for route in SCENARIO_ROUTES:
         check_route(checks, base, route, "FAQPage")
     try:
-        check_manifest(checks, base)
+        check_manifest(checks, base, min_manifest_version)
     except Exception as exc:
         add(checks, "manifest parse", False, str(exc))
     return checks
@@ -122,11 +130,21 @@ def main():
     ap.add_argument("--base", default=DEFAULT_BASE)
     ap.add_argument("--insecure", action="store_true", help="local smoke only: skip TLS verification")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--attempts", type=int, default=1)
+    ap.add_argument("--retry-delay", type=int, default=10)
+    ap.add_argument("--min-manifest-version", default="")
     args = ap.parse_args()
     if args.insecure:
         SSL_CONTEXT = ssl._create_unverified_context()
     base = args.base.rstrip("/")
-    checks = run(base)
+    attempts = max(1, args.attempts)
+    checks = []
+    for attempt in range(1, attempts + 1):
+        checks = run(base, args.min_manifest_version)
+        if all(c.ok for c in checks) or attempt == attempts:
+            break
+        print(f"production health attempt {attempt}/{attempts} failed; retrying", file=sys.stderr)
+        time.sleep(max(0, args.retry_delay))
     if args.json:
         print(json.dumps([c.__dict__ for c in checks], ensure_ascii=False, indent=2))
     else:

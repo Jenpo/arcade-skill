@@ -1,0 +1,44 @@
+name: rollback-pages
+on:
+  workflow_dispatch:
+    inputs:
+      target_ref:
+        description: Commit SHA or tag to redeploy
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    env:
+      ARCADE_TELEGRAM_BOT_TOKEN: ${{ secrets.ARCADE_TELEGRAM_BOT_TOKEN }}
+      ARCADE_TELEGRAM_CHAT_ID: ${{ secrets.ARCADE_TELEGRAM_CHAT_ID }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_ref }}
+      - run: python3 scripts/build_manifest.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Notify rollback result
+        if: ${{ env.ARCADE_TELEGRAM_BOT_TOKEN != '' && env.ARCADE_TELEGRAM_CHAT_ID != '' }}
+        run: >-
+          python3 scripts/growth/live_check.py
+          --message "Arcade rollback deployed: ${{ inputs.target_ref }}"
+          --require-delivery

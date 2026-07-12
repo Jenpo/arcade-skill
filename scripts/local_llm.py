@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import sys
+import urllib.error
 import urllib.request
 
 DEFAULT_BASE_URL = os.environ.get("ARCADE_LOCAL_LLM_BASE_URL", "http://192.168.31.68:4000/v1")
@@ -40,8 +41,12 @@ def post_json(url, payload, key, timeout):
     if key:
         headers["Authorization"] = f"Bearer {key}"
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")[:800]
+        raise RuntimeError(f"HTTP {exc.code}: {detail}") from exc
 
 
 def chat(args, prompt):
@@ -62,7 +67,7 @@ def chat(args, prompt):
         ],
         "max_tokens": args.max_tokens,
         "temperature": args.temperature,
-        "extra_body": {"reasoning_effort": False},
+        "reasoning_effort": False,
     }
     try:
         data = post_json(args.base_url.rstrip("/") + "/chat/completions", payload, key, args.timeout)

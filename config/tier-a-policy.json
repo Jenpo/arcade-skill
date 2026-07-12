@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "max_posts_per_day": 3,
+  "channels": {
+    "x": {"max_chars": 280},
+    "jike": {"max_chars": 1000}
+  },
+  "blocked_claims": [
+    {"pattern": "\\bglobal leaderboard\\b", "reason": "global ranking is not live"},
+    {"pattern": "\\bleaderboard is live\\b", "reason": "global ranking is not live"},
+    {"pattern": "\\bStripe Pro\\b", "reason": "Stripe Pro is not live"},
+    {"pattern": "buy\\.stripe\\.com", "reason": "Stripe checkout is not connected"}
+  ],
+  "allowed_hosts": [
+    "arcade.fxpeek.com",
+    "github.com",
+    "x.com"
+  ],
+  "p3_leaderboard_enabled": false,
+  "p3_disabled_reason": "Global leaderboard is not live; do not generate public ranking claims."
+}

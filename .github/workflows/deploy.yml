@@ -16,16 +16,56 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      ARCADE_TELEGRAM_BOT_TOKEN: ${{ secrets.ARCADE_TELEGRAM_BOT_TOKEN }}
+      ARCADE_TELEGRAM_CHAT_ID: ${{ secrets.ARCADE_TELEGRAM_CHAT_ID }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
       - name: Build manifest and bundles
         run: python3 scripts/build_manifest.py
+      - name: Record deploy versions
+        id: versions
+        run: |
+          echo "manifest=$(python3 -c 'import json; print(json.load(open("dist/manifest.json"))["manifest_version"])')" >> "$GITHUB_OUTPUT"
+          echo "previous=$(git rev-parse HEAD^)" >> "$GITHUB_OUTPUT"
+      - name: Visual regression gate
+        run: npx playwright test
+      - name: Upload visual report and diff images
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-visual-report
+          path: |
+            growth/reports/visual
+            growth/reports/visual-html
+          if-no-files-found: ignore
+          retention-days: 14
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
       - id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify production deployment
+        run: >-
+          python3 scripts/production_health.py
+          --attempts 12
+          --retry-delay 15
+          --min-manifest-version "${{ steps.versions.outputs.manifest }}"
+      - name: Notify deploy result
+        if: ${{ env.ARCADE_TELEGRAM_BOT_TOKEN != '' && env.ARCADE_TELEGRAM_CHAT_ID != '' }}
+        run: >-
+          python3 scripts/growth/live_check.py
+          --message "Arcade deploy PASS: manifest ${{ steps.versions.outputs.manifest }}"
+          --rollback-kind site
+          --rollback-ref "${{ steps.versions.outputs.previous }}"
+          --require-delivery

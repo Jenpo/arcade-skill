@@ -21,6 +21,7 @@ fast to launch, easy to lose, annoyingly tempting to replay.
 [View manifest](https://arcade.fxpeek.com/manifest.json) ·
 [llms.txt](https://arcade.fxpeek.com/llms.txt) ·
 [Design notes](docs/DESIGN.md) ·
+[Awesome Design MD proposal](docs/awesome-design-md-proposal.md) ·
 [Local LLM policy](docs/local-llm-policy.md) ·
 [Review action matrix](docs/review-action-matrix.md)
 
@@ -90,11 +91,11 @@ Arcade Skill tracks growth through five measurement and draft loops:
   with `scripts/growth/mention_radar.py`; every reply or PR stays manual.
 - **P2 Scenario page factory:** reviewed SEO/GEO page drafts come from
   `scripts/growth/seo_page_factory.py`.
-- **P3 Leaderboard digest:** Top 10 rows become bilingual social drafts through
-  `scripts/growth/leaderboard_digest.py`.
+- **P3 Leaderboard digest:** disabled in `config/tier-a-policy.json` until a
+  production global ranking exists; sample data is test-only.
 - **P4 Share of Model:** weekly prompt checks across AI engines are scored with
   `scripts/growth/som_tracker.py`.
-- **P5 Telemetry回流:** D1 event summaries from
+- **P5 Telemetry feedback:** D1 event summaries from
   `scripts/growth/telemetry_summary.sql` or a Markdown report from
   `scripts/growth/telemetry_report.py`.
 
@@ -119,6 +120,34 @@ python3 scripts/production_health.py
 `.github/workflows/production-health.yml` runs the same read-only checks every
 six hours: public routes, sitemap, manifest, Stripe support routing, ads flag,
 and bundle sha256 verification.
+
+Visual regression check:
+
+```bash
+npm ci
+npx playwright install chromium
+npm run test:visual
+```
+
+The Playwright suite captures `/scenarios/` at 1440x900 and 390x844, checks
+overflow, mobile cabinet order, the pixel player, and keyboard focus, then
+compares both pages with committed pixel baselines. CI uploads diff images from
+`growth/reports/visual` when a threshold is exceeded.
+
+Tier A owned-channel automation is guarded by
+`config/tier-a-policy.json`: at most three posts per day, no unreleased ranking
+or payment claims, no credential-shaped text, and only approved link hosts.
+`scripts/growth/own_channel_publisher.py` is idempotent and emits Telegram
+live-check receipts with rollback callback data. Third-party community replies
+and repository submissions never enter this automatic publisher.
+
+Tier A schedules run through Mac LaunchAgents so local LLM, Telegram, X browser
+session, and Cloudflare credentials stay on the Mac mini instead of being
+copied into GitHub. Install them with:
+
+```bash
+python3 scripts/install_tier_a_launchd.py --install
+```
 
 ## Local LLM Default
 

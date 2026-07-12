@@ -15,6 +15,8 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from local_review import append_review, run_local_review
+
 ROOT = Path(__file__).resolve().parents[2]
 KEYWORDS = ROOT / "scripts/growth/radar_keywords.json"
 DEFAULT_OUT = ROOT / "growth/radar/radar-latest.md"
@@ -182,6 +184,7 @@ def write_report(items, out: Path):
         ])
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(out)
+    return scored
 
 
 def main():
@@ -191,6 +194,11 @@ def main():
     ap.add_argument("--insecure", action="store_true", help="network smoke test only: skip TLS verification")
     ap.add_argument("--sample", type=Path, help="read public items from JSON")
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT)
+    ap.add_argument(
+        "--no-llm-review",
+        action="store_true",
+        help="skip the default local-only opportunity review",
+    )
     ap.add_argument("--limit", type=int, default=10)
     ap.add_argument("--hn-query", action="append", default=[
         "Claude Code waiting tests",
@@ -209,6 +217,14 @@ def main():
     if not items:
         raise SystemExit("no radar items found")
     write_report(items, args.out)
+    if not args.no_llm_review:
+        result = run_local_review(
+            "radar",
+            args.out.read_text(encoding="utf-8"),
+            max_tokens=550,
+        )
+        append_review(args.out, "Local LLM Opportunity Review", result)
+        print(f"local review: {result.get('status')}")
 
 
 if __name__ == "__main__":

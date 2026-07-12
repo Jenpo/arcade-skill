@@ -1,0 +1,10 @@
+{
+  "name": "arcade-skill-visual-regression",
+  "private": true,
+  "scripts": {
+    "test:visual": "python3 scripts/build_manifest.py && playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1"
+  }
+}

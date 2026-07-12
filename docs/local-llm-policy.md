@@ -54,3 +54,15 @@ python3 scripts/local_llm.py copy --input docs/DESIGN.md
 
 If no local router key is present, the command returns `LOCAL_LLM_PENDING`
 instead of calling a remote API.
+
+The mention radar and SEO page factory call this local review layer by default
+after their deterministic checks:
+
+```bash
+python3 scripts/growth/mention_radar.py --offline
+python3 scripts/growth/seo_page_factory.py --dry-run
+```
+
+Their generated reports record `PASS`, `LOCAL_LLM_PENDING`, or
+`LOCAL_LLM_UNAVAILABLE`. Use `--no-llm-review` only for an explicitly
+deterministic-only run. No status triggers an automatic paid API fallback.

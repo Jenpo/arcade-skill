@@ -2,6 +2,7 @@
 """Assemble the weekly Arcade Skill growth operating report."""
 import argparse
 import datetime as dt
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -31,7 +32,7 @@ def main():
 
     radar = ROOT / "growth/radar/radar-latest.md"
     seo_dir = ROOT / "growth/drafts/seo"
-    leaderboard = ROOT / "growth/drafts/leaderboard-latest.md"
+    policy = json.loads((ROOT / "config/tier-a-policy.json").read_text(encoding="utf-8"))
     som = ROOT / "growth/reports/som-latest.md"
     telemetry = ROOT / "growth/reports/telemetry-latest.md"
 
@@ -44,15 +45,16 @@ def main():
         "",
         f"- Radar review cards: {count_cards(radar)}",
         f"- SEO scenario drafts: {count_files(seo_dir, 'index.html')}",
-        f"- Leaderboard digest ready: {'yes' if leaderboard.exists() else 'no'}",
+        f"- P3 leaderboard publisher: {'enabled' if policy.get('p3_leaderboard_enabled') else 'disabled'}",
         f"- SoM report ready: {'yes' if som.exists() else 'no'}",
         f"- Telemetry report ready: {'yes' if telemetry.exists() else 'no'}",
         "",
         "## Human Review Queue",
         "",
         "- Review radar cards before any reply, PR, or social comment.",
-        "- Review SEO scenario pages before moving drafts into docs/scenarios.",
-        "- Review leaderboard rows for privacy before posting.",
+        "- Third-party replies and repository submissions require one-click approval.",
+        "- Tier A owned-channel items publish only after deterministic linter and fuse checks.",
+        "- P3 stays disabled until a production global ranking exists.",
         "",
         "## Current SoM",
         "",

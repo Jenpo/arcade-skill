@@ -42,8 +42,57 @@ Flash-era mini-game energy without becoming a generic games portal.
 
 Contribution posture:
 
-1. Open an issue first, because `VoltAgent/awesome-design-md` asks contributors
-   to discuss new entries before PRs.
-2. Link the live page: `https://arcade.fxpeek.com/scenarios/`.
-3. Link this design file and screenshots.
-4. Keep the ask as a design-pattern contribution, not product advertising.
+1. Use the upstream `Design MD Request` issue form. The repository currently
+   says it cannot accept external `DESIGN.md` pull requests.
+2. Submit `https://arcade.fxpeek.com/scenarios/` as the website.
+3. Use `data@fxpeek.com` as the project delivery email and Priority `No`.
+4. Link this design file and screenshots in Additional Details.
+5. Disclose maker ownership and request a generated review, not an endorsement.
+
+## Reference Audit
+
+### Reference
+
+- **Vercel:** quiet developer-tool hierarchy, compact technical labels, and
+  restrained 4-8px radii.
+- **Stripe:** one clear payment action, tabular treatment for money and status,
+  and explicit transaction trust copy.
+- **PlayStation:** real game state carries the visual story; chrome stays quiet,
+  sections have one job, and game surfaces avoid decorative shadows.
+
+### Keep
+
+- The terminal plus arcade-cabinet composition. It explains the agent waiting
+  room faster than generic product copy.
+- The phosphor, coin, danger, and paper palette. It belongs to this product and
+  should not be replaced by another brand's blue or indigo.
+- The visible Stripe and fair-ranking rules. Trust is part of the interface.
+
+### Fix
+
+- **P1 / `/scenarios/`:** use compact 6px actions and plain navigation links;
+  avoid making every link a pill.
+- **P1 / cabinet preview:** show a recognisable pixel person, not a generic
+  square, and use a flat screen color so the game state remains legible.
+- **P2 / scenario cards:** remove decorative shadows and keep cards as simple
+  indexed entries rather than floating marketing tiles.
+
+### Avoid
+
+- Vercel's monochrome identity, Stripe's mesh gradients, and PlayStation's blue
+  brand system. They are references for hierarchy, not skins to copy.
+- Oversized marketing headlines, decorative blobs, nested cards, and a payment
+  CTA that competes with the play action.
+
+### Verify
+
+- Desktop: product premise, cabinet, play action, and one scenario row are
+  visible without overlap at 1440x900.
+- Mobile: navigation wraps cleanly, the cabinet appears before long copy, and
+  no label or action overflows at 390x844.
+- Keyboard: every link has a visible focus state.
+- Trust: support remains Stripe-only, localhost remains ad-free, and no copy
+  claims that global ranking or Stripe Pro is already live.
+
+The ready-to-submit collaboration draft lives in
+[`docs/awesome-design-md-proposal.md`](awesome-design-md-proposal.md).

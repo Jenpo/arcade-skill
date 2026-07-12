@@ -62,6 +62,7 @@ STATIC_ROUTES = [
     "/support/",
     "/docs/project-intro.md",
     "/docs/DESIGN.md",
+    "/docs/awesome-design-md-proposal.md",
     "/docs/local-llm-policy.md",
     "/docs/intro.zh.md",
     "/docs/intro.en.md",

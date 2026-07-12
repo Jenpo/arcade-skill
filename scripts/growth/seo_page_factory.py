@@ -6,9 +6,12 @@ import json
 import re
 from pathlib import Path
 
+from local_review import run_local_review, write_review
+
 ROOT = Path(__file__).resolve().parents[2]
 KEYWORDS = ROOT / "scripts/growth/seo_keywords.json"
 DEFAULT_OUT = ROOT / "growth/drafts/seo"
+DEFAULT_REVIEW_OUT = ROOT / "growth/reports/seo-local-review-latest.md"
 PUBLISH_ROOT = ROOT / "docs/scenarios"
 
 
@@ -222,12 +225,19 @@ def main():
     ap.add_argument("--out-dir", type=Path, default=DEFAULT_OUT)
     ap.add_argument("--publish", action="store_true", help="write pages under docs/scenarios")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument(
+        "--no-llm-review",
+        action="store_true",
+        help="skip the default local-only SEO review",
+    )
+    ap.add_argument("--review-out", type=Path, default=DEFAULT_REVIEW_OUT)
     args = ap.parse_args()
 
     rows = json.loads(args.keywords.read_text(encoding="utf-8"))
     out_dir = PUBLISH_ROOT if args.publish else args.out_dir
     existing = load_existing_texts()
     report = []
+    generated_pages = []
     failed = False
     for row in rows:
         text = render_page(row)
@@ -235,6 +245,7 @@ def main():
         checks, count, sim, sim_path = qc_page(path, text, row["datapoint"], existing)
         status = "PASS" if all(checks.values()) else "FAIL"
         failed = failed or status == "FAIL"
+        generated_pages.append(f"## {row['title']}\n\n{text}")
         report.append({
             "status": status,
             "path": str(path),
@@ -249,6 +260,16 @@ def main():
 
     for row in report:
         print(json.dumps(row, ensure_ascii=False))
+    if not args.no_llm_review:
+        review_input = (
+            "Deterministic QC:\n"
+            + json.dumps(report, ensure_ascii=False, indent=2)
+            + "\n\nGenerated scenario pages:\n"
+            + "\n\n".join(generated_pages)
+        )
+        result = run_local_review("seo", review_input, max_tokens=800)
+        write_review(args.review_out, "Local LLM SEO Review", result)
+        print(f"local review: {result.get('status')} -> {args.review_out}")
     if failed:
         raise SystemExit("SEO QC failed")
 

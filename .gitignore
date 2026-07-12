@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 .DS_Store
 .wrangler/
+/growth/
+node_modules/
+test-results/
