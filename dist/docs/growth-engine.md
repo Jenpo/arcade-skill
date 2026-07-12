@@ -15,16 +15,18 @@ Radar can be automated. Publishing stays human-reviewed.
 ## Weekly Runbook
 
 ```bash
-python3 scripts/growth/mention_radar.py --offline
-python3 scripts/growth/seo_page_factory.py
-python3 scripts/growth/leaderboard_digest.py
-python3 scripts/growth/som_tracker.py init
-python3 scripts/growth/telemetry_report.py
-python3 scripts/growth/weekly_growth_report.py
+python3 scripts/growth/growth_smoke.py
 ```
 
-`--offline` uses bundled sample data for local testing. Remove it when you want
-the radar to fetch public HN, Reddit, and GitHub sources.
+This offline suite is also scheduled in GitHub Actions. It does not touch
+external communities and does not require production credentials.
+
+For a live radar pull, run:
+
+```bash
+python3 scripts/growth/mention_radar.py \
+  --out growth/radar/radar-latest.md
+```
 
 ## Status Matrix
 

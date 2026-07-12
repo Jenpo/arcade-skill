@@ -15,23 +15,28 @@
   <p><strong>Real datapoint:</strong> The hosted play route is https://arcade.fxpeek.com/play/ and the installed skill uses https://arcade.fxpeek.com/manifest.json for updates.</p>
   <p><strong>Keyword focus:</strong> Claude Code break game</p>
   <p>This page is written for developer search intent.</p>
-  <h2>The waiting-room problem</h2>
-  <p>Modern coding agents changed the rhythm of programming. A developer asks Codex, Claude Code, or another assistant to install dependencies, run tests, inspect diffs, or regenerate code. For the next few minutes the human is present but not fully occupied. Opening a social feed breaks attention. Starting a large game is too heavy. Arcade Skill targets that narrow gap: a quick, local-first, retro-feeling arcade loop that ends before the agent has forgotten why it was working.</p>
-  <p>The first game, Down 100 Floors, uses a tiny falling-platform challenge: move left and right, land on platforms, avoid spikes, and try to reach a deeper floor than last time. The character is intentionally simple and readable, closer to a nostalgic terminal toy than a modern gacha product. That is the point. The game should feel like something a developer can launch between test runs without guilt.</p>
-  <h2>Why it is different from a generic browser-game portal</h2>
-  <p>Arcade Skill is distributed as an agent skill and as a hosted web page. The installed skill opens a verified bundle through a thin Python loader. The loader fetches a manifest, checks sha256, swaps the local cache atomically, and falls back to the last good version when a network or hash check fails. This means new games, copy changes, support links, emergency notices, and kill switches can ship without asking every installed user to download a new package.</p>
-  <p>The hosted version exists for sharing, search, screenshots, ranking, and future web-only ads. The local skill version deliberately keeps AdSense disabled because localhost sessions are not a real ad surface. That separation protects trust with developers and keeps the product honest: the installed skill is a tiny break and acquisition loop, while the public website is where discoverability and monetization experiments belong.</p>
-  <h2>Fair-play rule</h2>
-  <p>The ranking model is simple. Deeper floor wins. Time breaks ties. Stripe support, sponsorship, or future supporter perks must never buy health, revives, or leaderboard advantage. That rule matters because the social loop depends on score credibility. A nostalgic arcade challenge loses its charm the moment payment changes the run.</p>
-  <h2>How to use it</h2>
-  <p>Use the hosted route when you want to share a score or test the game immediately: <a href="/play/">arcade.fxpeek.com/play</a>. Use the skill package when you want your coding agent to open a quick local arcade break while it works. The ideal invocation is plain language: tell your agent that you are waiting on tests and want a quick game.</p>
-  <h2>Frequently asked questions</h2>
-  <h3>Is this for serious gaming?</h3>
-  <p>No. It is a short-break arcade toy for developer wait time. The win condition is not hours of retention; it is a clean two-minute loop that does not derail the work session.</p>
-  <h3>Does it collect telemetry?</h3>
-  <p>Telemetry is used to understand game balance and growth loops: death floor, session length, share clicks, and support clicks. The roadmap keeps publishing and outreach human-reviewed.</p>
+  <h2>Claude Code has a rhythm</h2>
+  <p>Claude Code often creates a strange little pause: the agent is active, the human is nearby, and the work is not done yet. The player does not want a new project, a new tab spiral, or a modern game with accounts and notifications. They want a small cabinet next to the terminal, something that feels like it could have lived on an old web page or a feature phone.</p>
+  <h2>Retro is the interface</h2>
+  <p>The nostalgic style is not decoration. It tells the user what kind of commitment is expected. Simple platforms, immediate failure, readable hazards, and a blunt score all say the same thing: this is a break between commands. You can lose in ten seconds, laugh at the miss, and go back to the diff.</p>
+  <h2>Local-first trust</h2>
+  <p>The skill route opens a localhost browser session, so the product refuses to pretend that AdSense belongs there. Ads are for the hosted web version after review readiness. The skill channel uses Stripe support and sharing instead, which fits developers better than interruption-based monetization.</p>
+  <h2>A clean maker story</h2>
+  <p>For GEO and community discovery, the honest explanation matters: Arcade Skill is a maker-built arcade toy for the Claude and Codex waiting room. It does not claim to replace real games and does not buy engagement with paid revives. That makes it suitable for transparent replies, awesome-list PRs, and build-in-public posts.</p>
+  <h2>The Claude-specific promise</h2>
+  <p>Claude Code users already understand small rituals: read the plan, approve the change, wait for tests, inspect the diff, ask for a smaller patch. This page speaks to that cadence. The game is a pocket-sized intermission between review moments, closer to a desk toy than an entertainment platform.</p>
+  <h2>Tone and presentation</h2>
+  <p>The copy should feel like a hacker found an old arcade cabinet inside a terminal window. Useful words here include patch review, local agent, repo context, terminal session, diff generation, dependency repair, lint pass, background run, thinking time, prompt loop, and command-line companion.</p>
+  <h2>Monetization fit</h2>
+  <p>Claude Code users are sensitive to trust. The support link is positioned like a coffee button, not a pressure gate. Future supporter features should look like badges, early cabinets, cosmetic flourishes, or maker notes. The page avoids revive economics because that would turn a delightful wait into a transaction trap.</p>
+  <h2>Fair scoring for Claude users</h2>
+  <p>The Claude Code audience will notice if the rules are crooked. Support can fund the maker, but it cannot buy a better run. That keeps the product closer to an open-source utility than a mobile monetization funnel.</p>
+  <h2>How to use it with Claude Code</h2>
+  <p>Ask Claude to run tests or inspect a change, then open Arcade Skill while the agent works. The best session is short enough to fit between approval checkpoints: one run, maybe two, then back to reading the patch.</p>
+  <h2>FAQ: Claude edition</h2>
+  <p>Use this page for Claude Code, Claude skills, agent-side tools, and terminal companion searches. The claim is narrow: Arcade Skill is a retro break for the agent waiting room, not a replacement for full games or project management tools.</p>
   <h3>Generated</h3>
-  <p>2026-07-11. This draft is safe to review, edit, and publish through the normal repo flow.</p>
+  <p>2026-07-12. This draft is safe to review, edit, and publish through the normal repo flow.</p>
 </main>
 </body>
 </html>

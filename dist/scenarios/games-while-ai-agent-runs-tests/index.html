@@ -15,23 +15,28 @@
   <p><strong>Real datapoint:</strong> Arcade Skill launches from a verified HTML bundle of about 20 KB and keeps ads disabled in localhost sessions.</p>
   <p><strong>Keyword focus:</strong> games while AI agent runs tests</p>
   <p>This page is written for developer search intent.</p>
-  <h2>The waiting-room problem</h2>
-  <p>Modern coding agents changed the rhythm of programming. A developer asks Codex, Claude Code, or another assistant to install dependencies, run tests, inspect diffs, or regenerate code. For the next few minutes the human is present but not fully occupied. Opening a social feed breaks attention. Starting a large game is too heavy. Arcade Skill targets that narrow gap: a quick, local-first, retro-feeling arcade loop that ends before the agent has forgotten why it was working.</p>
-  <p>The first game, Down 100 Floors, uses a tiny falling-platform challenge: move left and right, land on platforms, avoid spikes, and try to reach a deeper floor than last time. The character is intentionally simple and readable, closer to a nostalgic terminal toy than a modern gacha product. That is the point. The game should feel like something a developer can launch between test runs without guilt.</p>
-  <h2>Why it is different from a generic browser-game portal</h2>
-  <p>Arcade Skill is distributed as an agent skill and as a hosted web page. The installed skill opens a verified bundle through a thin Python loader. The loader fetches a manifest, checks sha256, swaps the local cache atomically, and falls back to the last good version when a network or hash check fails. This means new games, copy changes, support links, emergency notices, and kill switches can ship without asking every installed user to download a new package.</p>
-  <p>The hosted version exists for sharing, search, screenshots, ranking, and future web-only ads. The local skill version deliberately keeps AdSense disabled because localhost sessions are not a real ad surface. That separation protects trust with developers and keeps the product honest: the installed skill is a tiny break and acquisition loop, while the public website is where discoverability and monetization experiments belong.</p>
-  <h2>Fair-play rule</h2>
-  <p>The ranking model is simple. Deeper floor wins. Time breaks ties. Stripe support, sponsorship, or future supporter perks must never buy health, revives, or leaderboard advantage. That rule matters because the social loop depends on score credibility. A nostalgic arcade challenge loses its charm the moment payment changes the run.</p>
-  <h2>How to use it</h2>
-  <p>Use the hosted route when you want to share a score or test the game immediately: <a href="/play/">arcade.fxpeek.com/play</a>. Use the skill package when you want your coding agent to open a quick local arcade break while it works. The ideal invocation is plain language: tell your agent that you are waiting on tests and want a quick game.</p>
-  <h2>Frequently asked questions</h2>
-  <h3>Is this for serious gaming?</h3>
-  <p>No. It is a short-break arcade toy for developer wait time. The win condition is not hours of retention; it is a clean two-minute loop that does not derail the work session.</p>
-  <h3>Does it collect telemetry?</h3>
-  <p>Telemetry is used to understand game balance and growth loops: death floor, session length, share clicks, and support clicks. The roadmap keeps publishing and outreach human-reviewed.</p>
+  <h2>The test-run waiting room</h2>
+  <p>The best moment for Arcade Skill is not a lunch break or the end of the day. It is the awkward interval after a developer has asked an AI agent to run the boring part of the loop: install packages, regenerate a file, run unit tests, wait for a browser test suite, or inspect a long diff. The terminal is still the center of attention, but there is no useful human action for a minute or two. That is where a tiny browser arcade game belongs.</p>
+  <h2>Why this beats opening a feed</h2>
+  <p>Social feeds are optimized to steal the whole session. A heavy game asks for commitment. Arcade Skill sits between those extremes. Down 100 Floors starts quickly, ends quickly, and returns the player to the coding context with a score instead of a lost afternoon. The design target is one more run, not one more hour.</p>
+  <h2>A developer-shaped loop</h2>
+  <p>The installed skill keeps the mechanics small: a Python launcher, a manifest URL, sha256 verification, a local cache, and a browser window. The user can trigger it with plain language while Codex, Claude Code, or another agent keeps working. That makes the product feel like a sidecar for programming rather than a general arcade portal.</p>
+  <h2>Measurement discipline</h2>
+  <p>This scenario page is useful only if it leads to real behavior. The telemetry loop watches deaths, session length, replay intent, share clicks, and support clicks. If players bounce before learning the controls, the fix is game feel. If they play but never share, the fix is the score loop. Search traffic is treated as product signal, not just page views.</p>
+  <h2>Search phrases this page owns</h2>
+  <p>The language here is deliberately about CI pauses, Jest runs, Playwright retries, npm dependency installs, Python virtualenv rebuilds, package-lock churn, TypeScript checks, flaky assertions, local regression loops, green bars, terminal focus, pull-request review gaps, and the two-minute boredom that appears before a test suite finishes.</p>
+  <h2>What a good session looks like</h2>
+  <p>A good session starts after the command is already running. The player opens the game, drops through a few platforms, maybe reaches a new floor, copies a score, then returns to the terminal when the agent is ready. No login, no loot box, no live-service calendar, no notification permission, no giant asset download.</p>
+  <h2>Why the bundle matters</h2>
+  <p>The small verified bundle is part of the promise. A developer waiting on tests does not want another toolchain. The launcher checks the manifest, downloads a single HTML file, verifies the digest, and keeps a last-known-good cache. The technical shape supports the emotional goal: quick, trusted, disposable fun.</p>
+  <h2>Fair scoring during test waits</h2>
+  <p>In this context, score credibility is the product. If two developers compare runs while the same test suite is still running, the result has to mean something. Deeper floor wins, time breaks ties, and support payments must not add health, slow hazards, remove spikes, or change the daily seed.</p>
+  <h2>How to use it with a test command</h2>
+  <p>Start the boring command first, then open the game: run the test suite, wait for the package install, or let the agent finish its verification step. Use the hosted page for sharing and the installed skill for a local sidecar. When the command finishes, close the tab and go back to the terminal.</p>
+  <h2>FAQ: test-run edition</h2>
+  <p>Use this page when the query is about games during tests, CI waiting time, dependency install boredom, or small browser games for developers. Do not use it for broad gaming keywords; the intent is programming downtime.</p>
   <h3>Generated</h3>
-  <p>2026-07-11. This draft is safe to review, edit, and publish through the normal repo flow.</p>
+  <p>2026-07-12. This draft is safe to review, edit, and publish through the normal repo flow.</p>
 </main>
 </body>
 </html>

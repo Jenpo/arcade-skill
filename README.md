@@ -102,11 +102,11 @@ the production root during `scripts/build_manifest.py`.
 One-command local growth smoke test:
 
 ```bash
-python3 scripts/growth/mention_radar.py --offline
-python3 scripts/growth/seo_page_factory.py
-python3 scripts/growth/leaderboard_digest.py
-python3 scripts/growth/weekly_growth_report.py
+python3 scripts/growth/growth_smoke.py
 ```
+
+The same offline suite runs in `.github/workflows/growth-smoke.yml` on pushes,
+pull requests, manual dispatch, and a daily schedule.
 
 ## Screenshots
 

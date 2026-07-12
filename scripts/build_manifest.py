@@ -57,6 +57,7 @@ MONETIZATION = {
 STATIC_ROUTES = [
     "/",
     "/about/",
+    "/scenarios/",
     "/play/",
     "/support/",
     "/docs/project-intro.md",
@@ -219,6 +220,9 @@ def main():
                 shutil.rmtree(scenarios_out)
             shutil.copytree(scenarios, scenarios_out)
             render_html_tree(scenarios_out)
+            scenarios_index = scenarios / "index.html"
+            if scenarios_index.exists():
+                copy_rendered_doc(scenarios_index, DIST / "scenarios.html")
         for name in ["llms.txt", "ai.txt"]:
             src = DOCS / name
             if src.exists():
