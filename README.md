@@ -121,6 +121,11 @@ python3 scripts/production_health.py
 six hours: public routes, sitemap, manifest, Stripe support routing, ads flag,
 and bundle sha256 verification.
 
+The deploy workflow verifies the exact new manifest on the GitHub Pages
+fallback. Production `arcade.fxpeek.com` remains a Cloudflare Pages deployment
+from the Mac release command, followed by a strict minimum-version production
+health check. Cloudflare credentials are not copied into GitHub.
+
 Visual regression check:
 
 ```bash

@@ -55,12 +55,18 @@ jobs:
           path: dist
       - id: deployment
         uses: actions/deploy-pages@v4
-      - name: Verify production deployment
+      - name: Verify GitHub Pages fallback deployment
+        run: >-
+          python3 scripts/wait_for_manifest.py
+          --url https://jenpo.github.io/arcade-skill/manifest.json
+          --minimum "${{ steps.versions.outputs.manifest }}"
+          --attempts 12
+          --retry-delay 10
+      - name: Verify production remains healthy
         run: >-
           python3 scripts/production_health.py
-          --attempts 12
-          --retry-delay 15
-          --min-manifest-version "${{ steps.versions.outputs.manifest }}"
+          --attempts 3
+          --retry-delay 10
       - name: Notify deploy result
         if: ${{ env.ARCADE_TELEGRAM_BOT_TOKEN != '' && env.ARCADE_TELEGRAM_CHAT_ID != '' }}
         run: >-
