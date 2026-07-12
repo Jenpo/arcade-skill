@@ -3,7 +3,7 @@
 import argparse
 import json
 import os
-import urllib.request
+import subprocess
 
 
 def configured():
@@ -21,16 +21,23 @@ def send_message(text, rollback_kind="", rollback_ref=""):
         payload["reply_markup"] = {
             "inline_keyboard": [[{"text": "Rollback", "callback_data": callback}]]
         }
-    req = urllib.request.Request(
-        f"https://api.telegram.org/bot{token}/sendMessage",
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
     try:
-        with opener.open(req, timeout=15) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
+        proc = subprocess.run(
+            [
+                "curl", "--silent", "--show-error", "--fail-with-body",
+                "--noproxy", "*", "--max-time", "15",
+                "--header", "Content-Type: application/json",
+                "--data-binary", json.dumps(payload, ensure_ascii=False),
+                f"https://api.telegram.org/bot{token}/sendMessage",
+            ],
+            text=True,
+            capture_output=True,
+            timeout=20,
+            check=False,
+        )
+        if proc.returncode:
+            raise RuntimeError((proc.stderr or proc.stdout or "curl failed")[-500:])
+        data = json.loads(proc.stdout)
     except Exception as exc:
         return {"status": "LIVE_CHECK_UNAVAILABLE", "reason": str(exc)}
     if not data.get("ok"):
