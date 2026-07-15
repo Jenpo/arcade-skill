@@ -223,8 +223,12 @@ docs/             screenshots, language intros, launch copy
 5. Deploy production:
 
 ```bash
+python3 scripts/build_manifest.py
 bash scripts/deploy_cloudflare_pages.sh
 ```
+
+The deploy script publishes the existing `dist/` exactly and does not rebuild
+it implicitly. Use `--build` only when a fresh timestamped manifest is intended.
 
 6. Installed users receive the new bundle on next launch from
    `https://arcade.fxpeek.com/manifest.json`.

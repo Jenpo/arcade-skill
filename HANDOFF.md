@@ -14,7 +14,7 @@ project: arcade-skill
 - Verified branch: `main`; use the production manifest and current Actions runs
   below as deployment evidence instead of a handoff-embedded commit pointer.
 - Production: `https://arcade.fxpeek.com`
-- Production manifest: `2026.07.13-0744`
+- Production manifest: `2026.07.16-0345`
 - Game bundle: `tower100-1.5.1.html`, sha256 prefix `9defc2e001da`
 - Last verified deployment commit: `0a01628`.
 
