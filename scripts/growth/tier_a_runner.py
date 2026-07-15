@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Mac-local Tier A scheduler; credentials never leave the machine."""
 import argparse
+import datetime as dt
 import json
 import os
 import shlex
@@ -106,11 +107,18 @@ def task_seo():
 
 
 def task_som():
+    source = None
+    if os.environ.get("ARCADE_SOM_CODEX_ENABLED") == "1":
+        target = ROOT / "growth/som" / f"{dt.date.today().isoformat()}-codex.jsonl"
+        if not target.exists():
+            run([sys.executable, "scripts/growth/som_codex_collector.py", "--out", str(target)])
+        source = target
     candidates = sorted((ROOT / "growth/som").glob("*.jsonl")) if (ROOT / "growth/som").exists() else []
-    if not candidates:
+    if source is None and candidates:
+        source = max(candidates, key=lambda path: path.stat().st_mtime)
+    if source is None:
         notify("Arcade Tier A SoM PENDING\nNo reviewed weekly engine-response export is available.")
         return
-    source = candidates[-1]
     out = ROOT / "growth/reports" / f"som-{source.stem}.md"
     run([sys.executable, "scripts/growth/som_tracker.py", "score", "--input", str(source), "--out", str(out)])
     notify(f"Arcade Tier A SoM PASS\n{out.name}")

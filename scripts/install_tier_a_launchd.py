@@ -33,6 +33,7 @@ def payload(task, schedule):
         "EnvironmentVariables": {
             "PATH": os.environ.get("PATH", "/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin"),
             "NO_PROXY": "127.0.0.1,localhost,192.168.0.0/16,192.168.2.1,192.168.31.0/24",
+            "ARCADE_SOM_CODEX_ENABLED": os.environ.get("ARCADE_SOM_CODEX_ENABLED", "0"),
         },
     }
     if "StartInterval" in schedule:

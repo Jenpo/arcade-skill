@@ -1,7 +1,7 @@
 ---
 type: project-handoff
 status: active
-updated: 2026-07-13
+updated: 2026-07-16
 project: arcade-skill
 ---
 
@@ -14,9 +14,9 @@ project: arcade-skill
 - Verified branch: `main`; use the production manifest and current Actions runs
   below as deployment evidence instead of a handoff-embedded commit pointer.
 - Production: `https://arcade.fxpeek.com`
-- Production manifest: `2026.07.13-0732`
+- Production manifest: `2026.07.13-0744`
 - Game bundle: `tower100-1.5.1.html`, sha256 prefix `9defc2e001da`
-- Worktree was clean after the final deployment commit.
+- Last verified deployment commit: `0a01628`.
 
 ## Verified
 
@@ -26,7 +26,7 @@ project: arcade-skill
 - Playwright desktop 1440x900 and mobile 390x844 structure and platform-specific
   pixel baselines: PASS on macOS and GitHub Ubuntu.
 - GitHub Actions for `build-and-deploy`, `visual-regression`, and
-  `growth-smoke`: PASS on `a4a2328`.
+  `growth-smoke`: PASS on `0a01628`.
 - Cloudflare production routes, support status, ads-off flag, manifest schema,
   kill switch, and bundle hash: PASS.
 - VoltAgent request created: https://github.com/VoltAgent/awesome-design-md/issues/445
@@ -37,6 +37,11 @@ project: arcade-skill
   - Production health every six hours
   - Owned-channel queue every five minutes
 - LaunchAgent health run: exit 0, Telegram receipt `message_id=29943`.
+- Local LiteLLM route recovered after starting the stopped Worker-Pro Ollama
+  service; authenticated `growth_smoke` now reports local reviews as PASS.
+- A bounded OpenAI Codex CLI proxy sample produced 5 observed rows and 20
+  explicit unobserved rows (`20%` coverage). The scored report was delivered to
+  Telegram as `message_id=30026`; mention and citation rates were both `0/5`.
 
 ## Ownership Boundaries
 
@@ -50,9 +55,11 @@ project: arcade-skill
 
 ## Still Open
 
-1. **SoM second real data point:** no five-engine answer export is available in
-   the current environment. Empty answers must remain PENDING and must not be
-   reported as 0% mention rate.
+1. **SoM full second data point:** the OpenAI/Codex proxy sample is complete,
+   but Claude, Perplexity, Gemini, and Copilot remain unobserved. The current
+   `5/25` sample is honest partial coverage, not a complete five-engine data
+   point. Empty or unobserved answers remain PENDING and are not scored as
+   misses.
 2. **One-click rollback callback:** notification messages and rollback workflow
    exist, but a dedicated Telegram bot plus a repo-scoped GitHub Actions token
    are still required before the callback Worker can be deployed safely. Do not
@@ -61,6 +68,49 @@ project: arcade-skill
    acceptance window has only just started.
 4. **Stripe checkout:** still pending; support route is live, but no
    `buy.stripe.com` link, Pro, or global ranking may be claimed.
+
+## Pending Commit
+
+The current worktree contains the tested SoM collector and local LLM routing
+fix. Do not discard it. It still needs final visual/build checks, commit, push,
+deployment, and production verification:
+
+- `scripts/growth/som_batch_schema.json` (new)
+- `scripts/growth/som_codex_collector.py` (new)
+- `scripts/growth/tier_a_runner.py` (modified)
+- `scripts/growth/tier_a_smoke.py` (modified)
+- `scripts/growth/som_tracker.py` (modified)
+- `scripts/install_tier_a_launchd.py` (modified)
+- `scripts/local_llm.py` (modified)
+- `docs/growth-engine.md` (modified)
+- `docs/local-llm-policy.md` (modified)
+
+Completed checks: Python compile, schema load, one bounded proxy collection,
+25-row validation, atomic-write/concurrency tests, SoM scoring, Tier A smoke,
+authenticated local-LLM growth smoke, LaunchAgent reload, and Telegram delivery.
+Scheduled cloud collection is explicitly off (`ARCADE_SOM_CODEX_ENABLED=0`).
+
+## Product Truth
+
+- The playable character is an original pixel person, not a plain block.
+- Tower100 v1.5.1, multilingual project pages, BGM/SFX, hosted play, sharing,
+  telemetry, Stripe support routing, and local best score are live.
+- Stripe checkout is not live. `/support/` is a truthful waiting/support route.
+- Ads are disabled. AdSense must never be claimed for localhost skill sessions.
+- A production global leaderboard does not exist; P3 remains disabled.
+- The Egret original is not copied. Game code and visual assets are original.
+
+## Non-Negotiable Rules
+
+- Low-risk copy, SEO/GEO, critique, and summaries use the local LLM first. Do
+  not silently fall back to a paid API. External model calls are allowed only
+  for explicit external measurement or diagnosis.
+- Tier A owned channels may publish automatically only after deterministic
+  lint, rate-limit, idempotency, live-check, and rollback gates pass.
+- Tier B Reddit/HN/V2EX and third-party issues/PRs stay one-click approved.
+- Never expose or copy credentials into GitHub, logs, chat, or documentation.
+- Do not mark the goal complete until full SoM evidence, safe rollback callback,
+  and seven days of unattended Tier A evidence are verified.
 
 ## Resume Commands
 
@@ -71,6 +121,3 @@ python3 scripts/growth/tier_a_runner.py health
 python3 scripts/growth/growth_smoke.py
 npm run test:visual
 ```
-
-Do not mark the goal complete until the SoM observation, rollback callback, and
-one-week unattended-run evidence are real and verified.

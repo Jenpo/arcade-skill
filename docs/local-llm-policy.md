@@ -36,6 +36,10 @@ export LITELLM_MASTER_KEY=...
 export S8_LLM_ROUTER_KEY=...
 ```
 
+On the Mac scheduler, the helper also reads the existing local-only key file at
+`~/Library/Application Support/S8/.litellm_master_key`. Override its location
+with `ARCADE_LOCAL_LLM_KEY_FILE`; the key is never copied into the repository.
+
 Optional overrides:
 
 ```bash

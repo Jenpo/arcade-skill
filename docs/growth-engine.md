@@ -158,6 +158,19 @@ auto-post or scrape logged-in answers without review.
 The scorer reports coverage separately and refuses to count empty answers as
 misses. A missing engine export is `PENDING`, not a synthetic 0% mention rate.
 
+The Mac Monday job can optionally collect the five fixed prompts in one
+isolated Codex CLI batch. This is an OpenAI-family proxy observation, not a
+ChatGPT UI measurement. It leaves Claude, Perplexity, Gemini, and Copilot
+explicitly unobserved until those surfaces are connected. Cloud collection is
+off by default; opt in for a scheduled run explicitly:
+
+```bash
+export ARCADE_SOM_CODEX_ENABLED=1
+python3 scripts/install_tier_a_launchd.py --install
+python3 scripts/growth/som_codex_collector.py
+python3 scripts/growth/tier_a_runner.py som
+```
+
 ## P5: Telemetry回流
 
 Use D1 event data to answer:

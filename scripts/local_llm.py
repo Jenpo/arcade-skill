@@ -6,11 +6,16 @@ import os
 import sys
 import urllib.error
 import urllib.request
+from pathlib import Path
 
 DEFAULT_BASE_URL = os.environ.get("ARCADE_LOCAL_LLM_BASE_URL", "http://192.168.31.68:4000/v1")
 DEFAULT_MODEL = os.environ.get("ARCADE_LOCAL_LLM_MODEL", "s8_local_fast_v1")
 DEFAULT_REVIEW_MODEL = os.environ.get("ARCADE_LOCAL_LLM_REVIEW_MODEL", "s8_local_main_v1")
 KEY_ENV_NAMES = ["ARCADE_LOCAL_LLM_API_KEY", "LITELLM_MASTER_KEY", "S8_LLM_ROUTER_KEY"]
+DEFAULT_KEY_FILE = Path(os.environ.get(
+    "ARCADE_LOCAL_LLM_KEY_FILE",
+    Path.home() / "Library/Application Support/S8/.litellm_master_key",
+))
 
 TASK_PROMPTS = {
     "design-review": "你是严苛但务实的网页设计评审。只输出最值得改的3点、不要改的2点、可执行建议。",
@@ -25,6 +30,8 @@ def api_key():
         value = os.environ.get(name)
         if value:
             return value
+    if DEFAULT_KEY_FILE.is_file():
+        return DEFAULT_KEY_FILE.read_text(encoding="utf-8").strip()
     return ""
 
 

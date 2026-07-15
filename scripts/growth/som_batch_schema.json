@@ -1,0 +1,34 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["answers"],
+  "properties": {
+    "answers": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["prompt_id", "answer", "citations"],
+        "properties": {
+          "prompt_id": {
+            "type": "string",
+            "enum": [
+              "agent_wait_game",
+              "developer_break_game",
+              "retro_agent_skill",
+              "hot_update_skill",
+              "fair_arcade_monetization"
+            ]
+          },
+          "answer": {"type": "string"},
+          "citations": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    }
+  }
+}

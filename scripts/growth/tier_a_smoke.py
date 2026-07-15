@@ -7,6 +7,7 @@ import tempfile
 from pathlib import Path
 
 from content_linter import lint_text, load_policy
+from som_codex_collector import build_rows, exclusive_lock, write_jsonl_atomic
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -64,8 +65,39 @@ def main():
         require(proc.returncode == 0, proc.stderr or proc.stdout)
         report = som_output.read_text(encoding="utf-8")
         require("Prompts observed: 1 (50.0% coverage)" in report, "SoM coverage gate is incorrect")
+        require("not direct UI measurements" in report, "SoM proxy disclosure is missing")
 
-    print("tier a smoke ok: linter, daily fuse, idempotent dry-run, P3 disabled, SoM coverage")
+        prompts = json.loads((ROOT / "scripts/growth/som_prompts.json").read_text(encoding="utf-8"))
+        batch = {
+            "answers": [
+                {"prompt_id": row["id"], "answer": f"answer for {row['id']}", "citations": []}
+                for row in prompts
+            ]
+        }
+        collected = build_rows(prompts, batch, "2026-07-16")
+        require(len(collected) == 25, "SoM collector must emit 25 rows")
+        require(
+            sum(row["observation_status"] == "observed_proxy" for row in collected) == 5,
+            "SoM collector must emit exactly five proxy observations",
+        )
+        require(
+            sum(row["observation_status"] == "unobserved" for row in collected) == 20,
+            "SoM collector must preserve 20 unobserved rows",
+        )
+        collected_path = tmp_path / "collected.jsonl"
+        write_jsonl_atomic(collected_path, collected)
+        require(len(collected_path.read_text(encoding="utf-8").splitlines()) == 25, "atomic JSONL write failed")
+        lock_path = tmp_path / ".collector.lock"
+        with exclusive_lock(lock_path):
+            try:
+                with exclusive_lock(lock_path):
+                    pass
+            except SystemExit:
+                pass
+            else:
+                raise SystemExit("collector concurrency lock did not block a duplicate run")
+
+    print("tier a smoke ok: linter, fuse, dry-run, P3 disabled, SoM coverage and collector")
 
 
 if __name__ == "__main__":
