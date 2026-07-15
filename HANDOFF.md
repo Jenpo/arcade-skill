@@ -16,7 +16,8 @@ project: arcade-skill
 - Production: `https://arcade.fxpeek.com`
 - Production manifest: `2026.07.16-0345`
 - Game bundle: `tower100-1.5.1.html`, sha256 prefix `9defc2e001da`
-- Last verified deployment commit: `0a01628`.
+- Verified functional change set: `c0861a4` (use live manifest and Actions as
+  release evidence; do not keep chasing a self-referential handoff commit).
 
 ## Verified
 
@@ -26,7 +27,7 @@ project: arcade-skill
 - Playwright desktop 1440x900 and mobile 390x844 structure and platform-specific
   pixel baselines: PASS on macOS and GitHub Ubuntu.
 - GitHub Actions for `build-and-deploy`, `visual-regression`, and
-  `growth-smoke`: PASS on `0a01628`.
+  `growth-smoke`: PASS on `c0861a4`.
 - Cloudflare production routes, support status, ads-off flag, manifest schema,
   kill switch, and bundle hash: PASS.
 - VoltAgent request created: https://github.com/VoltAgent/awesome-design-md/issues/445
@@ -48,6 +49,9 @@ project: arcade-skill
 - GitHub Actions deploys and verifies the `jenpo.github.io` fallback.
 - Mac Wrangler deploys `dist/` to Cloudflare Pages production, then
   `production_health.py --min-manifest-version` proves the release.
+- GitHub Pages must not have `arcade.fxpeek.com` configured as a custom domain;
+  otherwise its fallback URL redirects back to production and ceases to be an
+  independent recovery path. `dist/CNAME` is deliberately absent.
 - Telegram, local LLM, X browser session, and Cloudflare credentials stay on
   the Mac. They are not copied into GitHub.
 - Tier A owned surfaces can run unattended only after deterministic gates.
@@ -69,11 +73,10 @@ project: arcade-skill
 4. **Stripe checkout:** still pending; support route is live, but no
    `buy.stripe.com` link, Pro, or global ranking may be claimed.
 
-## Pending Commit
+## Delivered Change Set
 
-The current worktree contains the tested SoM collector and local LLM routing
-fix. Do not discard it. It still needs final visual/build checks, commit, push,
-deployment, and production verification:
+The tested SoM collector and local LLM routing fix were committed, pushed, and
+deployed in `cd875b4` plus the exact-artifact deploy fix in `c0861a4`:
 
 - `scripts/growth/som_batch_schema.json` (new)
 - `scripts/growth/som_codex_collector.py` (new)
@@ -89,6 +92,8 @@ Completed checks: Python compile, schema load, one bounded proxy collection,
 25-row validation, atomic-write/concurrency tests, SoM scoring, Tier A smoke,
 authenticated local-LLM growth smoke, LaunchAgent reload, and Telegram delivery.
 Scheduled cloud collection is explicitly off (`ARCADE_SOM_CODEX_ENABLED=0`).
+Playwright passed locally and in GitHub Actions. Cloudflare production passed
+strict health verification at manifest `2026.07.16-0345`.
 
 ## Product Truth
 

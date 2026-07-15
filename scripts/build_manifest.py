@@ -14,7 +14,6 @@ DOCS = ROOT / "docs"
 
 # ---- release registry: bump a version here to ship a new build ----
 BASE_URL = "https://arcade.fxpeek.com"       # owned domain; production runs on Cloudflare Pages
-CUSTOM_DOMAIN = "arcade.fxpeek.com"          # kept for GitHub Pages fallback compatibility
 SIGNING_KEY_B64 = os.environ.get("ARCADE_MANIFEST_SIGNING_KEY", "")
 STRIPE_SUPPORT_URL = os.environ.get(
     "ARCADE_STRIPE_SUPPORT_URL", f"{BASE_URL}/support/")
@@ -188,7 +187,9 @@ def main():
     manifest_path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     maybe_sign_manifest(manifest_path)
-    (DIST / "CNAME").write_text(CUSTOM_DOMAIN + "\n", encoding="utf-8")
+    # GitHub Pages must remain an independent fallback, not redirect to the
+    # Cloudflare-owned production hostname.
+    (DIST / "CNAME").unlink(missing_ok=True)
     if DOCS.exists():
         docs_out = DIST / "docs"
         if docs_out.exists():
@@ -231,7 +232,7 @@ def main():
             if src.exists():
                 shutil.copy2(src, DIST / name)
     write_search_files()
-    print(f"manifest {manifest['manifest_version']} → dist/manifest.json  (CNAME: {CUSTOM_DOMAIN})")
+    print(f"manifest {manifest['manifest_version']} → dist/manifest.json")
 
 
 if __name__ == "__main__":
