@@ -33,16 +33,28 @@ QUERIES = [
 ]
 
 
+def extract_results(raw: str):
+    decoder = json.JSONDecoder()
+    for offset, char in enumerate(raw):
+        if char != "[":
+            continue
+        try:
+            data, _ = decoder.raw_decode(raw[offset:])
+        except json.JSONDecodeError:
+            continue
+        if isinstance(data, list) and data and isinstance(data[0], dict) and "results" in data[0]:
+            return data[0].get("results", [])
+    raise ValueError("wrangler output did not include D1 JSON results")
+
+
 def run_query(database: str, sql: str):
     proc = subprocess.run(
         ["npx", "wrangler", "d1", "execute", database, "--remote", "--command", sql],
-        check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    raw = proc.stdout
-    start = raw.find("[")
-    if start < 0:
-        raise SystemExit("wrangler output did not include JSON")
-    data = json.loads(raw[start:])
-    return data[0].get("results", [])
+        check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    try:
+        return extract_results(proc.stdout)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
 
 
 def table(rows):

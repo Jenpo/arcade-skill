@@ -9,6 +9,7 @@ from pathlib import Path
 
 from content_linter import lint_text, load_policy
 from som_codex_collector import build_rows, exclusive_lock, write_jsonl_atomic
+from telemetry_report import extract_results
 from tier_a_audit import evaluate
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -131,7 +132,10 @@ def main():
         })
         require(evaluate(audit_rows, 1, now)["status"] == "PENDING", "Tier A audit ignored an incomplete run")
 
-    print("tier a smoke ok: linter, fuse, dry-run, P3 disabled, SoM, collector, audit")
+        noisy = "\x1b[33mWARNING proxy [not-json]\x1b[0m\n" + json.dumps([{"results": [{"ok": 1}]}])
+        require(extract_results(noisy) == [{"ok": 1}], "D1 parser accepted Wrangler warning as JSON")
+
+    print("tier a smoke ok: linter, fuse, dry-run, P3 disabled, SoM, collector, audit, D1 parser")
 
 
 if __name__ == "__main__":
