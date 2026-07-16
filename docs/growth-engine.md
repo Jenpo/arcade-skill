@@ -49,6 +49,11 @@ python3 scripts/growth/tier_a_audit.py --days 7 --require-pass
 The verifier requires roughly 90% interval coverage, all three weekly jobs,
 no failed runs, no orphaned `started` rows, and at least 167 hours of evidence.
 
+SoM job execution success is separate from measurement completeness. The
+scheduler reports `PENDING` until the weekly export contains exactly 25
+non-empty `observed_direct` rows across the fixed five-engine prompt set. Proxy
+observations remain useful evidence but cannot close the direct SoM target.
+
 Production health is separate:
 
 ```bash

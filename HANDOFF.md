@@ -14,7 +14,7 @@ project: arcade-skill
 - Verified branch: `main`; use the production manifest and current Actions runs
   below as deployment evidence instead of a handoff-embedded commit pointer.
 - Production: `https://arcade.fxpeek.com`
-- Production manifest: `2026.07.16-0851`
+- Production manifest: `2026.07.16-1308`
 - Game bundle: `tower100-1.5.1.html`, sha256 prefix `9defc2e001da`
 - Verified functional change sets: `c0861a4` (exact Cloudflare artifact),
   `840b50c` (independent GitHub manifest fallback), and `2e6a530` (loader v1.2
@@ -45,6 +45,13 @@ project: arcade-skill
 - A bounded OpenAI Codex CLI proxy sample produced 5 observed rows and 20
   explicit unobserved rows (`20%` coverage). The scored report was delivered to
   Telegram as `message_id=30026`; mention and citation rates were both `0/5`.
+- Tier A audit ledger and persistent `caffeinate -s` LaunchAgent are installed.
+  Queue, health, SoM, weekly, and SEO all produced real `trigger=launchd`
+  receipts. The final SEO chain passed local LLM review, SSH push, Cloudflare
+  deploy, strict production health, and Telegram delivery (`message_id=30053`).
+- Two first-run defects were caught and fixed: Wrangler ANSI warnings no longer
+  corrupt D1 JSON parsing, and unattended Git pushes now use the verified SSH
+  remote. SEO publishing now fails closed when local LLM review is unavailable.
 
 ## Ownership Boundaries
 
@@ -64,18 +71,22 @@ project: arcade-skill
 
 ## Still Open
 
-1. **SoM full second data point:** the OpenAI/Codex proxy sample is complete,
-   but Claude, Perplexity, Gemini, and Copilot remain unobserved. The current
-   `5/25` sample is honest partial coverage, not a complete five-engine data
-   point. Empty or unobserved answers remain PENDING and are not scored as
-   misses.
+1. **SoM full second data point:** the OpenAI/Codex proxy sample is complete.
+   Chrome sessions for ChatGPT, Claude, and Gemini are usable; Perplexity can
+   query anonymously but presents a login layer; Copilot is blocked on sign-in.
+   One direct ChatGPT prompt was checked and did not mention Arcade Skill, but
+   the complete `25/25` direct export is still pending. The scheduler now emits
+   `SoM PENDING` until all 25 rows are marked `observed_direct` with answers.
 2. **One-click rollback callback:** notification messages and rollback workflow
    exist, but a dedicated Telegram bot plus a repo-scoped GitHub Actions token
    are still required before the callback Worker can be deployed safely. Do not
    reuse the Hermes polling bot webhook or a broad `gh` token.
-3. **One-week proof:** LaunchAgents are active, but the 7-day unattended-run
-   acceptance window must restart after the audit-ledger/keepawake deployment.
-   Only `tier_a_audit.py --days 7 --require-pass` can close this item.
+3. **One-week proof:** LaunchAgents are active and kept awake. The acceptance
+   window restarted after the last repaired full-chain pass at
+   `2026-07-16T05:08:51Z`; earlier failed discovery runs remain in the ledger
+   and are intentionally not erased. Only
+   `tier_a_audit.py --days 7 --require-pass` can close this item after seven
+   real days.
 4. **Stripe checkout:** still pending; support route is live, but no
    `buy.stripe.com` link, Pro, or global ranking may be claimed.
 
@@ -99,7 +110,7 @@ Completed checks: Python compile, schema load, one bounded proxy collection,
 authenticated local-LLM growth smoke, LaunchAgent reload, and Telegram delivery.
 Scheduled cloud collection is explicitly off (`ARCADE_SOM_CODEX_ENABLED=0`).
 Playwright passed locally and in GitHub Actions. Cloudflare production passed
-strict health verification at manifest `2026.07.16-0851`.
+strict health verification at manifest `2026.07.16-1308`.
 GitHub Pages custom-domain binding was cleared and the direct manifest endpoint
 now returns HTTP 200 instead of redirecting to production (`840b50c`).
 Loader v1.2 verified all four bundle mirrors at SHA256 `9defc2e001da...`.

@@ -123,6 +123,16 @@ def task_seo():
     notify(f"Arcade Tier A SEO deploy PASS\nmanifest {manifest}", "site", previous[:40])
 
 
+def som_direct_coverage(source):
+    rows = [json.loads(line) for line in source.read_text(encoding="utf-8").splitlines() if line.strip()]
+    direct = [
+        row for row in rows
+        if row.get("observation_status") == "observed_direct"
+        and str(row.get("answer", "")).strip()
+    ]
+    return len(direct), len(rows)
+
+
 def task_som():
     source = None
     if os.environ.get("ARCADE_SOM_CODEX_ENABLED") == "1":
@@ -138,7 +148,11 @@ def task_som():
         return
     out = ROOT / "growth/reports" / f"som-{source.stem}.md"
     run([sys.executable, "scripts/growth/som_tracker.py", "score", "--input", str(source), "--out", str(out)])
-    notify(f"Arcade Tier A SoM PASS\n{out.name}")
+    direct, total = som_direct_coverage(source)
+    if total != 25 or direct != 25:
+        notify(f"Arcade Tier A SoM PENDING\nDirect coverage {direct}/25\n{out.name}")
+        return
+    notify(f"Arcade Tier A SoM PASS\nDirect coverage 25/25\n{out.name}")
 
 
 def task_weekly():

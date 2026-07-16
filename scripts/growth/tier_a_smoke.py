@@ -12,6 +12,7 @@ from content_linter import lint_text, load_policy
 from som_codex_collector import build_rows, exclusive_lock, write_jsonl_atomic
 from telemetry_report import extract_results
 from tier_a_audit import evaluate
+from tier_a_runner import som_direct_coverage
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -157,6 +158,16 @@ def main():
         )
         require(proc.returncode != 0, "SEO publish gate ignored unavailable local LLM")
         require(not list(blocked_out.rglob("index.html")), "failed SEO review wrote publishable pages")
+
+        som_coverage = tmp_path / "som-coverage.jsonl"
+        som_coverage.write_text(
+            "\n".join(json.dumps({
+                "observation_status": "observed_direct" if index < 24 else "observed_proxy",
+                "answer": "answer",
+            }) for index in range(25)) + "\n",
+            encoding="utf-8",
+        )
+        require(som_direct_coverage(som_coverage) == (24, 25), "SoM direct coverage gate is incorrect")
 
     print("tier a smoke ok: linter, fuse, dry-run, P3 disabled, SoM, collector, audit, D1 parser, local gate")
 
