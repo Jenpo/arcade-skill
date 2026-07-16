@@ -238,6 +238,7 @@ def main():
     existing = load_existing_texts()
     report = []
     generated_pages = []
+    generated_outputs = []
     failed = False
     for row in rows:
         text = render_page(row)
@@ -254,9 +255,7 @@ def main():
             "similar_to": str(sim_path) if sim_path else "",
             "checks": checks,
         })
-        if not args.dry_run:
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(text, encoding="utf-8")
+        generated_outputs.append((path, text))
 
     for row in report:
         print(json.dumps(row, ensure_ascii=False))
@@ -270,8 +269,13 @@ def main():
         result = run_local_review("seo", review_input, max_tokens=800)
         write_review(args.review_out, "Local LLM SEO Review", result)
         print(f"local review: {result.get('status')} -> {args.review_out}")
+        failed = failed or result.get("status") != "PASS"
     if failed:
-        raise SystemExit("SEO QC failed")
+        raise SystemExit("SEO gate failed: deterministic QC or local LLM review unavailable")
+    if not args.dry_run:
+        for path, text in generated_outputs:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text, encoding="utf-8")
 
 
 if __name__ == "__main__":

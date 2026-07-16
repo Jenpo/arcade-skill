@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 LOCAL_LLM = ROOT / "scripts/local_llm.py"
 
 
-def run_local_review(task, text, max_tokens=700, review_model=False):
+def run_local_review(task, text, max_tokens=700, review_model=False, timeout=180):
     cmd = [
         sys.executable,
         str(LOCAL_LLM),
@@ -28,7 +28,7 @@ def run_local_review(task, text, max_tokens=700, review_model=False):
             input=text,
             text=True,
             capture_output=True,
-            timeout=90,
+            timeout=timeout,
             check=False,
         )
     except subprocess.TimeoutExpired:

@@ -2,6 +2,7 @@
 """Offline contract tests for the Tier A owned-channel safety layer."""
 import json
 import datetime as dt
+import os
 import subprocess
 import sys
 import tempfile
@@ -135,7 +136,29 @@ def main():
         noisy = "\x1b[33mWARNING proxy [not-json]\x1b[0m\n" + json.dumps([{"results": [{"ok": 1}]}])
         require(extract_results(noisy) == [{"ok": 1}], "D1 parser accepted Wrangler warning as JSON")
 
-    print("tier a smoke ok: linter, fuse, dry-run, P3 disabled, SoM, collector, audit, D1 parser")
+        blocked_out = tmp_path / "blocked-seo"
+        blocked_env = os.environ.copy()
+        blocked_env.update({
+            "ARCADE_LOCAL_LLM_API_KEY": "offline-smoke",
+            "ARCADE_LOCAL_LLM_BASE_URL": "http://127.0.0.1:1/v1",
+        })
+        proc = subprocess.run(
+            [
+                sys.executable,
+                "scripts/growth/seo_page_factory.py",
+                "--out-dir", str(blocked_out),
+                "--review-out", str(tmp_path / "blocked-review.md"),
+            ],
+            cwd=ROOT,
+            env=blocked_env,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        require(proc.returncode != 0, "SEO publish gate ignored unavailable local LLM")
+        require(not list(blocked_out.rglob("index.html")), "failed SEO review wrote publishable pages")
+
+    print("tier a smoke ok: linter, fuse, dry-run, P3 disabled, SoM, collector, audit, D1 parser, local gate")
 
 
 if __name__ == "__main__":
