@@ -147,6 +147,9 @@ disabled by `config/tier-a-policy.json` until global ranking is live:
 python3 scripts/growth/leaderboard_digest.py
 ```
 
+This command exits without writing while `p3_leaderboard_enabled` is false.
+Enable it only after the production global ranking contract is live and tested.
+
 After ranking is wired, pass a production export:
 
 ```bash

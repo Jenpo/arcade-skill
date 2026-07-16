@@ -8,6 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_INPUT = ROOT / "scripts/growth/leaderboard_sample.json"
 DEFAULT_OUT = ROOT / "growth/drafts/leaderboard-latest.md"
+POLICY = ROOT / "config/tier-a-policy.json"
 
 
 def fmt_time(ms):
@@ -84,6 +85,9 @@ def main():
     ap.add_argument("--input", type=Path, default=DEFAULT_INPUT)
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT)
     args = ap.parse_args()
+    policy = json.loads(POLICY.read_text(encoding="utf-8"))
+    if not policy.get("p3_leaderboard_enabled"):
+        raise SystemExit("P3 leaderboard digest is disabled until a production global ranking exists")
     data = json.loads(args.input.read_text(encoding="utf-8")) if args.input.exists() else {"rows": []}
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(render(data), encoding="utf-8")

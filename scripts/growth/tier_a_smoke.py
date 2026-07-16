@@ -32,6 +32,18 @@ def main():
     require(policy.get("max_posts_per_day") == 3, "daily fuse must remain at 3")
     require(policy.get("p3_leaderboard_enabled") is False, "P3 must remain disabled before global ranking")
 
+    with tempfile.TemporaryDirectory(prefix="arcade-p3-") as p3_tmp:
+        p3_out = Path(p3_tmp) / "leaderboard.md"
+        proc = subprocess.run(
+            [sys.executable, "scripts/growth/leaderboard_digest.py", "--out", str(p3_out)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        require(proc.returncode != 0, "P3 generator ran while leaderboard was disabled")
+        require(not p3_out.exists(), "disabled P3 generator wrote a draft")
+
     with tempfile.TemporaryDirectory(prefix="arcade-tier-a-") as tmp:
         tmp_path = Path(tmp)
         ledger = tmp_path / "ledger.jsonl"
