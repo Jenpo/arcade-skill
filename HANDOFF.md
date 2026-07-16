@@ -14,7 +14,7 @@ project: arcade-skill
 - Verified branch: `main`; use the production manifest and current Actions runs
   below as deployment evidence instead of a handoff-embedded commit pointer.
 - Production: `https://arcade.fxpeek.com`
-- Production manifest: `2026.07.16-1321`
+- Production manifest: `2026.07.17-0548`
 - Game bundle: `tower100-1.5.1.html`, sha256 prefix `9defc2e001da`
 - Verified functional change sets: `c0861a4` (exact Cloudflare artifact),
   `840b50c` (independent GitHub manifest fallback), and `2e6a530` (loader v1.2
@@ -29,7 +29,7 @@ project: arcade-skill
 - Playwright desktop 1440x900 and mobile 390x844 structure and platform-specific
   pixel baselines: PASS on macOS and GitHub Ubuntu.
 - GitHub Actions for `build-and-deploy`, `visual-regression`, and
-  `growth-smoke`: PASS on `2e6a530`.
+  `growth-smoke`: PASS on `90b6da5`.
 - Cloudflare production routes, support status, ads-off flag, manifest schema,
   kill switch, and bundle hash: PASS.
 - VoltAgent request created: https://github.com/VoltAgent/awesome-design-md/issues/445
@@ -126,7 +126,7 @@ contamination exclusion, Tier A smoke, authenticated local-LLM growth smoke,
 LaunchAgent retry, Telegram delivery, and desktop/mobile Playwright regression.
 Scheduled cloud collection is explicitly off (`ARCADE_SOM_CODEX_ENABLED=0`).
 Playwright passed locally and in GitHub Actions. Cloudflare production passed
-strict health verification at manifest `2026.07.16-1308`.
+strict health verification at manifest `2026.07.17-0548`.
 GitHub Pages custom-domain binding was cleared and the direct manifest endpoint
 now returns HTTP 200 instead of redirecting to production (`840b50c`).
 Loader v1.2 verified all four bundle mirrors at SHA256 `9defc2e001da...`.
