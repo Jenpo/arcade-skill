@@ -21,8 +21,10 @@ The operating model has two tiers:
 python3 scripts/growth/growth_smoke.py
 ```
 
-This offline suite is also scheduled in GitHub Actions. It does not touch
-external communities and does not require production credentials.
+This suite is also scheduled in GitHub Actions. Radar and SEO run their
+deterministic gates without LLM review, followed by one bounded 20-token local
+LLM probe. Formal radar and SEO jobs still use the local review layer by
+default. The smoke suite never falls back to a paid API.
 
 Mac-local Tier A jobs keep Telegram, local LLM, Cloudflare, and browser-session
 credentials on the Mac mini:
@@ -34,7 +36,18 @@ python3 scripts/growth/tier_a_runner.py health
 
 The installer defines: SoM Monday, SEO Wednesday, weekly telemetry Sunday,
 production health every six hours, and owned-channel queue polling every five
-minutes.
+minutes. It also keeps the AC-powered Mac mini awake with a dedicated
+`caffeinate -s` LaunchAgent. Every task writes an append-only local audit row;
+failures emit a Telegram alert without including exception text or secrets.
+
+Verify a full unattended window only after seven real days have elapsed:
+
+```bash
+python3 scripts/growth/tier_a_audit.py --days 7 --require-pass
+```
+
+The verifier requires roughly 90% interval coverage, all three weekly jobs,
+no failed runs, no orphaned `started` rows, and at least 167 hours of evidence.
 
 Production health is separate:
 

@@ -2,11 +2,13 @@
 """Mac-local Tier A scheduler; credentials never leave the machine."""
 import argparse
 import datetime as dt
+import fcntl
 import json
 import os
 import shlex
 import subprocess
 import sys
+import uuid
 from pathlib import Path
 
 from live_check import send_message
@@ -16,6 +18,10 @@ HERMES_ENV = Path(os.environ.get("ARCADE_HERMES_ENV", Path.home() / ".hermes/.en
 ROUTER_SH = Path(os.environ.get(
     "ARCADE_LOCAL_LLM_KEY_SOURCE",
     Path.home() / "Library/Application Support/S8/run_s8_litellm_router.sh",
+))
+AUDIT_LEDGER = Path(os.environ.get(
+    "ARCADE_TIER_A_AUDIT_LEDGER",
+    Path.home() / "Library/Logs/arcade-skill/tier-a-audit.jsonl",
 ))
 
 
@@ -67,6 +73,16 @@ def capture(cmd):
     return subprocess.check_output(cmd, cwd=ROOT, text=True).strip()
 
 
+def append_audit(row):
+    AUDIT_LEDGER.parent.mkdir(parents=True, exist_ok=True)
+    with AUDIT_LEDGER.open("a+", encoding="utf-8") as stream:
+        fcntl.flock(stream.fileno(), fcntl.LOCK_EX)
+        stream.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
+        stream.flush()
+        os.fsync(stream.fileno())
+        fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
+
+
 def notify(message, rollback_kind="", rollback_ref=""):
     result = send_message(message, rollback_kind, rollback_ref)
     print(json.dumps(result, ensure_ascii=False))
@@ -95,6 +111,7 @@ def task_seo():
     run(["git", "commit", "-m", "chore: publish scheduled arcade scenarios"])
     run(["git", "push", "origin", "main"])
     manifest = json.loads((ROOT / "dist/manifest.json").read_text(encoding="utf-8"))["manifest_version"]
+    run(["bash", "scripts/deploy_cloudflare_pages.sh"])
     run([
         sys.executable,
         "scripts/production_health.py",
@@ -163,7 +180,37 @@ def main():
     ap.add_argument("task", choices=sorted(TASKS))
     args = ap.parse_args()
     load_local_secrets()
-    TASKS[args.task]()
+    started = dt.datetime.now(dt.UTC)
+    base = {
+        "run_id": uuid.uuid4().hex,
+        "task": args.task,
+        "trigger": os.environ.get("ARCADE_TIER_A_TRIGGER", "manual"),
+        "pid": os.getpid(),
+        "git_head": capture(["git", "rev-parse", "HEAD"]),
+    }
+    append_audit({**base, "status": "started", "timestamp": started.strftime("%Y-%m-%dT%H:%M:%SZ")})
+    try:
+        TASKS[args.task]()
+    except BaseException as exc:
+        finished = dt.datetime.now(dt.UTC)
+        append_audit({
+            **base,
+            "status": "failed",
+            "timestamp": finished.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "duration_seconds": round((finished - started).total_seconds(), 3),
+            "error_type": exc.__class__.__name__,
+        })
+        receipt = send_message(f"Arcade Tier A {args.task} FAIL\n{exc.__class__.__name__}")
+        print(json.dumps(receipt, ensure_ascii=False))
+        raise
+    else:
+        finished = dt.datetime.now(dt.UTC)
+        append_audit({
+            **base,
+            "status": "pass",
+            "timestamp": finished.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "duration_seconds": round((finished - started).total_seconds(), 3),
+        })
 
 
 if __name__ == "__main__":

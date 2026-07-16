@@ -7,9 +7,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def run(cmd):
+def run(cmd, input_text=None):
     print("+ " + " ".join(str(x) for x in cmd))
-    subprocess.run(cmd, cwd=ROOT, check=True)
+    subprocess.run(cmd, cwd=ROOT, check=True, text=True, input=input_text)
 
 
 def main():
@@ -19,12 +19,15 @@ def main():
     out = args.out_dir
     out.mkdir(parents=True, exist_ok=True)
 
-    run(["python3", "scripts/growth/mention_radar.py", "--offline", "--out", str(out / "radar.md")])
-    run(["python3", "scripts/growth/seo_page_factory.py", "--dry-run"])
+    run(["python3", "scripts/growth/mention_radar.py", "--offline", "--no-llm-review", "--out", str(out / "radar.md")])
+    run(["python3", "scripts/growth/seo_page_factory.py", "--dry-run", "--no-llm-review"])
     run(["python3", "scripts/growth/tier_a_smoke.py"])
     run(["python3", "scripts/test_launcher_fallback.py"])
     run(["python3", "scripts/growth/weekly_growth_report.py", "--out", str(out / "weekly.md")])
-    run(["python3", "scripts/local_llm.py", "design-review", "--input", "docs/scenarios/index.html", "--json"])
+    run(
+        ["python3", "scripts/local_llm.py", "copy", "--json", "--max-tokens", "20", "--timeout", "45"],
+        input_text="只输出OK",
+    )
     print(f"growth smoke ok: {out}")
 
 

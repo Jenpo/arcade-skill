@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 LAUNCH_AGENTS = Path.home() / "Library/LaunchAgents"
 LOG_DIR = Path.home() / "Library/Logs/arcade-skill"
 RUNNER = ROOT / "scripts/growth/tier_a_runner.py"
+KEEP_AWAKE_LABEL = "com.fxpeek.arcade.tier-a.keepawake"
 
 JOBS = {
     "som": {"Weekday": 1, "Hour": 11, "Minute": 5},
@@ -34,6 +35,7 @@ def payload(task, schedule):
             "PATH": os.environ.get("PATH", "/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin"),
             "NO_PROXY": "127.0.0.1,localhost,192.168.0.0/16,192.168.2.1,192.168.31.0/24",
             "ARCADE_SOM_CODEX_ENABLED": os.environ.get("ARCADE_SOM_CODEX_ENABLED", "0"),
+            "ARCADE_TIER_A_TRIGGER": "launchd",
         },
     }
     if "StartInterval" in schedule:
@@ -50,6 +52,20 @@ def main():
     LAUNCH_AGENTS.mkdir(parents=True, exist_ok=True)
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     uid = os.getuid()
+    keepawake_path = LAUNCH_AGENTS / f"{KEEP_AWAKE_LABEL}.plist"
+    keepawake_path.write_bytes(plistlib.dumps({
+        "Label": KEEP_AWAKE_LABEL,
+        "ProgramArguments": ["/usr/bin/caffeinate", "-s"],
+        "RunAtLoad": True,
+        "KeepAlive": True,
+        "ProcessType": "Background",
+        "StandardOutPath": str(LOG_DIR / "keepawake.log"),
+        "StandardErrorPath": str(LOG_DIR / "keepawake.error.log"),
+    }, sort_keys=False))
+    print(keepawake_path)
+    if args.install:
+        subprocess.run(["launchctl", "bootout", f"gui/{uid}/{KEEP_AWAKE_LABEL}"], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["launchctl", "bootstrap", f"gui/{uid}", str(keepawake_path)], check=True)
     for task, schedule in JOBS.items():
         label, data = payload(task, schedule)
         path = LAUNCH_AGENTS / f"{label}.plist"

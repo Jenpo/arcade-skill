@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline contract tests for the Tier A owned-channel safety layer."""
 import json
+import datetime as dt
 import subprocess
 import sys
 import tempfile
@@ -8,6 +9,7 @@ from pathlib import Path
 
 from content_linter import lint_text, load_policy
 from som_codex_collector import build_rows, exclusive_lock, write_jsonl_atomic
+from tier_a_audit import evaluate
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -97,7 +99,39 @@ def main():
             else:
                 raise SystemExit("collector concurrency lock did not block a duplicate run")
 
-    print("tier a smoke ok: linter, fuse, dry-run, P3 disabled, SoM coverage and collector")
+        now = dt.datetime(2026, 7, 16, 12, 0, tzinfo=dt.UTC)
+        audit_rows = []
+        for index in range(260):
+            timestamp = now - dt.timedelta(hours=24) + dt.timedelta(seconds=index * 330)
+            audit_rows.append({
+                "run_id": f"queue-{index}",
+                "task": "queue", "trigger": "launchd", "status": "pass",
+                "timestamp": timestamp.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            })
+        for task, count in {"health": 4, "som": 1, "seo": 1, "weekly": 1}.items():
+            for index in range(count):
+                timestamp = now - dt.timedelta(hours=23, minutes=50) + dt.timedelta(minutes=index)
+                audit_rows.append({
+                    "run_id": f"{task}-{index}",
+                    "task": task, "trigger": "launchd", "status": "pass",
+                    "timestamp": timestamp.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                })
+        audit = evaluate(audit_rows, 1, now)
+        require(audit["status"] == "PASS", "Tier A audit rejected complete evidence")
+        audit_rows.append({
+            "run_id": "failed-health",
+            "task": "health", "trigger": "launchd", "status": "failed",
+            "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        })
+        require(evaluate(audit_rows, 1, now)["status"] == "PENDING", "Tier A audit ignored a failure")
+        audit_rows.pop()
+        audit_rows.append({
+            "run_id": "orphan", "task": "queue", "trigger": "launchd", "status": "started",
+            "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        })
+        require(evaluate(audit_rows, 1, now)["status"] == "PENDING", "Tier A audit ignored an incomplete run")
+
+    print("tier a smoke ok: linter, fuse, dry-run, P3 disabled, SoM, collector, audit")
 
 
 if __name__ == "__main__":

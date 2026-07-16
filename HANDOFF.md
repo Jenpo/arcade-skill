@@ -53,8 +53,8 @@ project: arcade-skill
   `production_health.py --min-manifest-version` proves the release.
 - GitHub Pages must not have `arcade.fxpeek.com` configured as a custom domain;
   otherwise its fallback URL redirects back to production and ceases to be an
-  independent manifest source. `dist/CNAME` is deliberately absent. This is
-  Loader v1.2 adds verified bundle mirrors across GitHub Pages, raw GitHub, and
+  independent manifest source. `dist/CNAME` is deliberately absent. Loader
+  v1.2 adds verified bundle mirrors across GitHub Pages, raw GitHub, and
   jsDelivr. Older v1.1 installations keep the primary `entry` compatibility
   path and still require reinstalling the skill to gain mirror retries.
 - Telegram, local LLM, X browser session, and Cloudflare credentials stay on
@@ -74,7 +74,8 @@ project: arcade-skill
    are still required before the callback Worker can be deployed safely. Do not
    reuse the Hermes polling bot webhook or a broad `gh` token.
 3. **One-week proof:** LaunchAgents are active, but the 7-day unattended-run
-   acceptance window has only just started.
+   acceptance window must restart after the audit-ledger/keepawake deployment.
+   Only `tier_a_audit.py --days 7 --require-pass` can close this item.
 4. **Stripe checkout:** still pending; support route is live, but no
    `buy.stripe.com` link, Pro, or global ranking may be claimed.
 

@@ -152,7 +152,12 @@ copied into GitHub. Install them with:
 
 ```bash
 python3 scripts/install_tier_a_launchd.py --install
+python3 scripts/growth/tier_a_audit.py --days 7
 ```
+
+The installer keeps the AC-powered scheduler awake and records append-only
+task evidence under `~/Library/Logs/arcade-skill/`. A seven-day PASS requires
+continuous launchd evidence; manual runs do not count.
 
 ## Local LLM Default
 
