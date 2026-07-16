@@ -14,7 +14,7 @@ project: arcade-skill
 - Verified branch: `main`; use the production manifest and current Actions runs
   below as deployment evidence instead of a handoff-embedded commit pointer.
 - Production: `https://arcade.fxpeek.com`
-- Production manifest: `2026.07.16-1313`
+- Production manifest: `2026.07.16-1321`
 - Game bundle: `tower100-1.5.1.html`, sha256 prefix `9defc2e001da`
 - Verified functional change sets: `c0861a4` (exact Cloudflare artifact),
   `840b50c` (independent GitHub manifest fallback), and `2e6a530` (loader v1.2
