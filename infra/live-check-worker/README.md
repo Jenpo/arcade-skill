@@ -7,6 +7,8 @@ Routes:
 - `GET /health`
 - `POST /telegram/webhook`
 
+Worker URL: `https://arcade-live-check.fxpeek.workers.dev`
+
 Required Worker secrets:
 
 ```text

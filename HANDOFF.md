@@ -14,7 +14,7 @@ project: arcade-skill
 - Verified branch: `main`; use the production manifest and current Actions runs
   below as deployment evidence instead of a handoff-embedded commit pointer.
 - Production: `https://arcade.fxpeek.com`
-- Production manifest: `2026.07.16-1308`
+- Production manifest: `2026.07.16-1313`
 - Game bundle: `tower100-1.5.1.html`, sha256 prefix `9defc2e001da`
 - Verified functional change sets: `c0861a4` (exact Cloudflare artifact),
   `840b50c` (independent GitHub manifest fallback), and `2e6a530` (loader v1.2
@@ -52,6 +52,10 @@ project: arcade-skill
 - Two first-run defects were caught and fixed: Wrangler ANSI warnings no longer
   corrupt D1 JSON parsing, and unattended Git pushes now use the verified SSH
   remote. SEO publishing now fails closed when local LLM review is unavailable.
+- The rollback callback shell is deployed at
+  `https://arcade-live-check.fxpeek.workers.dev`: `/health` returns 200 and an
+  unauthenticated webhook request returns 401. No Telegram webhook is registered
+  and no rollback credential is installed yet.
 
 ## Ownership Boundaries
 
@@ -77,13 +81,14 @@ project: arcade-skill
    One direct ChatGPT prompt was checked and did not mention Arcade Skill, but
    the complete `25/25` direct export is still pending. The scheduler now emits
    `SoM PENDING` until all 25 rows are marked `observed_direct` with answers.
-2. **One-click rollback callback:** notification messages and rollback workflow
-   exist, but a dedicated Telegram bot plus a repo-scoped GitHub Actions token
-   are still required before the callback Worker can be deployed safely. Do not
-   reuse the Hermes polling bot webhook or a broad `gh` token.
+2. **One-click rollback callback:** notification messages, rollback workflow,
+   and the deployed Worker shell exist. A dedicated Telegram bot, random webhook
+   secret, and repo-scoped GitHub Actions token are still required before
+   registering the webhook and enabling buttons. Do not reuse the Hermes polling
+   bot webhook or a broad `gh` token.
 3. **One-week proof:** LaunchAgents are active and kept awake. The acceptance
    window restarted after the last repaired full-chain pass at
-   `2026-07-16T05:08:51Z`; earlier failed discovery runs remain in the ledger
+   `2026-07-16T05:15:10Z`; earlier failed discovery runs remain in the ledger
    and are intentionally not erased. Only
    `tier_a_audit.py --days 7 --require-pass` can close this item after seven
    real days.
