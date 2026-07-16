@@ -21,6 +21,11 @@ Default OpenAI-compatible endpoint:
 http://192.168.31.68:4000/v1
 ```
 
+`scripts/local_llm.py` opens this private endpoint directly and deliberately
+ignores inherited HTTP/SOCKS proxy variables. This prevents a desktop proxy from
+returning a misleading 502 for a healthy LAN router. External model traffic is
+not routed through this helper.
+
 Default aliases:
 
 - `s8_local_fast_v1` for lightweight copy, radar, and smoke tasks

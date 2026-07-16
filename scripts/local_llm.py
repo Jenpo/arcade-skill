@@ -16,6 +16,7 @@ DEFAULT_KEY_FILE = Path(os.environ.get(
     "ARCADE_LOCAL_LLM_KEY_FILE",
     Path.home() / "Library/Application Support/S8/.litellm_master_key",
 ))
+DIRECT_OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
 TASK_PROMPTS = {
     "design-review": "你是严苛但务实的网页设计评审。只输出最值得改的3点、不要改的2点、可执行建议。",
@@ -49,7 +50,9 @@ def post_json(url, payload, key, timeout):
         headers["Authorization"] = f"Bearer {key}"
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        # This helper is LAN-local by contract; inherited desktop proxies can
+        # otherwise turn a healthy private router into a misleading HTTP 502.
+        with DIRECT_OPENER.open(req, timeout=timeout) as resp:
             return json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")[:800]

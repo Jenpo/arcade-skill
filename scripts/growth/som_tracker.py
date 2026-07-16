@@ -6,6 +6,7 @@ answers from AI engines, but does not automate posting, promotion, or logged-in
 scraping.
 """
 import argparse, datetime as dt, json, re
+from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -14,7 +15,7 @@ DEFAULT_INPUT = ROOT / "growth/som_responses.jsonl"
 DEFAULT_OUT = ROOT / "growth/reports/som-latest.md"
 
 MENTION_PATTERNS = [
-    re.compile(r"\barcade skill\b", re.I),
+    re.compile(r"\bArcade Skill\b"),
     re.compile(r"\barcade\.fxpeek\.com\b", re.I),
     re.compile(r"\bgithub\.com/Jenpo/arcade-skill\b", re.I),
     re.compile(r"\bdown 100 floors\b", re.I),
@@ -82,9 +83,10 @@ def score_file(src: Path, out: Path):
     if not rows:
         raise SystemExit(f"no rows in {src}")
     imported = len(rows)
+    status_counts = Counter(row.get("observation_status", "observed_direct") for row in rows)
     observed_rows = [
         row for row in rows
-        if row.get("observation_status") != "unobserved"
+        if row.get("observation_status", "observed_direct") in {"observed_direct", "observed_proxy"}
         and (str(row.get("answer", "")).strip() or any(str(x).strip() for x in row.get("citations", [])))
     ]
     if not observed_rows:
@@ -109,6 +111,11 @@ def score_file(src: Path, out: Path):
         bucket[2] += int(r["cited"])
 
     out.parent.mkdir(parents=True, exist_ok=True)
+    methodology_note = (
+        "Proxy observations are model-family signals, not direct UI measurements."
+        if status_counts.get("observed_proxy")
+        else "Observed rows are direct UI measurements; contaminated and timed-out rows are excluded."
+    )
     lines = [
         "# Arcade Skill Share Of Model",
         "",
@@ -119,7 +126,7 @@ def score_file(src: Path, out: Path):
         f"- Mention rate: {mentions}/{total} ({mentions / total:.1%})",
         f"- Citation rate: {cites}/{total} ({cites / total:.1%})",
         "",
-        "Proxy observations are model-family signals, not direct UI measurements.",
+        methodology_note,
         "",
         "## By Engine",
         "",
@@ -135,6 +142,9 @@ def score_file(src: Path, out: Path):
             lines.append(f"- `{engine_label(r)}` / `{r.get('prompt_id','?')}`: no mention")
     unobserved = imported - total
     lines.extend(["", "## Coverage Gaps", "", f"- Unobserved rows: {unobserved}"])
+    for status, count in sorted(status_counts.items()):
+        if status != "observed_direct":
+            lines.append(f"- `{status}`: {count}")
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(out)
 

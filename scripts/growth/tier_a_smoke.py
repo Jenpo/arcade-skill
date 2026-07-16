@@ -10,6 +10,7 @@ from pathlib import Path
 
 from content_linter import lint_text, load_policy
 from som_codex_collector import build_rows, exclusive_lock, write_jsonl_atomic
+from som_tracker import score_row
 from telemetry_report import extract_results
 from tier_a_audit import evaluate
 from tier_a_runner import som_direct_coverage
@@ -31,6 +32,8 @@ def main():
     require(lint_text("Read https://example.com", "x", policy), "unapproved external host passed")
     require(policy.get("max_posts_per_day") == 3, "daily fuse must remain at 3")
     require(policy.get("p3_leaderboard_enabled") is False, "P3 must remain disabled before global ranking")
+    require(not score_row({"answer": "build your own arcade skill", "citations": []})[0], "generic arcade skill phrase counted as brand")
+    require(score_row({"answer": "Arcade Skill by Jenpo", "citations": []})[0], "exact Arcade Skill brand was missed")
 
     with tempfile.TemporaryDirectory(prefix="arcade-p3-") as p3_tmp:
         p3_out = Path(p3_tmp) / "leaderboard.md"
@@ -68,8 +71,9 @@ def main():
         som_input = tmp_path / "som.jsonl"
         som_output = tmp_path / "som.md"
         som_input.write_text(
-            json.dumps({"engine": "Example", "prompt_id": "seen", "answer": "No matching project."}) + "\n"
-            + json.dumps({"engine": "Example", "prompt_id": "blank", "answer": ""}) + "\n",
+            json.dumps({"engine": "Example", "prompt_id": "seen", "answer": "No matching project.", "observation_status": "observed_proxy"}) + "\n"
+            + json.dumps({"engine": "Claude", "prompt_id": "contaminated", "answer": "Arcade Skill", "observation_status": "contaminated_local_install"}) + "\n"
+            + json.dumps({"engine": "Example", "prompt_id": "blank", "answer": "", "observation_status": "unobserved"}) + "\n",
             encoding="utf-8",
         )
         proc = subprocess.run(
@@ -81,7 +85,9 @@ def main():
         )
         require(proc.returncode == 0, proc.stderr or proc.stdout)
         report = som_output.read_text(encoding="utf-8")
-        require("Prompts observed: 1 (50.0% coverage)" in report, "SoM coverage gate is incorrect")
+        require("Prompts observed: 1 (33.3% coverage)" in report, "SoM coverage gate is incorrect")
+        require("Mention rate: 0/1" in report, "SoM scorer counted a contaminated local install")
+        require("`contaminated_local_install`: 1" in report, "SoM report hid contaminated coverage")
         require("not direct UI measurements" in report, "SoM proxy disclosure is missing")
 
         prompts = json.loads((ROOT / "scripts/growth/som_prompts.json").read_text(encoding="utf-8"))

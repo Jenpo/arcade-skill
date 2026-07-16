@@ -177,7 +177,12 @@ Fill `growth/som_responses.jsonl` manually or from approved exports. Do not
 auto-post or scrape logged-in answers without review.
 
 The scorer reports coverage separately and refuses to count empty answers as
-misses. A missing engine export is `PENDING`, not a synthetic 0% mention rate.
+misses. Use `observed_direct` only for a clean, direct product surface;
+`contaminated_local_install`, `timed_out`, and `unobserved` rows are reported as
+coverage gaps and excluded from mention rates. A missing engine export is
+`PENDING`, not a synthetic 0% mention rate. Generic lowercase uses of “arcade
+skill” are not brand mentions; count the exact `Arcade Skill` name, owned domain,
+repository URL, or game title.
 
 The Mac Monday job can optionally collect the five fixed prompts in one
 isolated Codex CLI batch. This is an OpenAI-family proxy observation, not a

@@ -1,7 +1,7 @@
 ---
 type: project-handoff
 status: active
-updated: 2026-07-16
+updated: 2026-07-17
 project: arcade-skill
 ---
 
@@ -41,10 +41,17 @@ project: arcade-skill
   - Owned-channel queue every five minutes
 - LaunchAgent health run: exit 0, Telegram receipt `message_id=29943`.
 - Local LiteLLM route recovered after starting the stopped Worker-Pro Ollama
-  service; authenticated `growth_smoke` now reports local reviews as PASS.
-- A bounded OpenAI Codex CLI proxy sample produced 5 observed rows and 20
-  explicit unobserved rows (`20%` coverage). The scored report was delivered to
-  Telegram as `message_id=30026`; mention and citation rates were both `0/5`.
+  service. A later inherited-proxy 502 was fixed by making the LAN-only helper
+  bypass desktop proxies; authenticated `growth_smoke` reports PASS without any
+  paid API fallback.
+- The second direct SoM observation now has 20 clean rows across ChatGPT,
+  Perplexity, Gemini, and Copilot. Gemini mentioned `Arcade Skill (by Jenpo)`
+  once without an owned URL; the valid result is therefore `1/20` mentions
+  (`5%`) and `0/20` citations. Claude's five rows are explicitly marked
+  `contaminated_local_install` because the signed-in profile loads the installed
+  Arcade skill even in Claude incognito. The report was delivered to Telegram
+  as `message_id=30067`, and the clean LaunchAgent retry delivered
+  `message_id=30068`.
 - Tier A audit ledger and persistent `caffeinate -s` LaunchAgent are installed.
   Queue, health, SoM, weekly, and SEO all produced real `trigger=launchd`
   receipts. The final SEO chain passed local LLM review, SSH push, Cloudflare
@@ -75,21 +82,24 @@ project: arcade-skill
 
 ## Still Open
 
-1. **SoM full second data point:** the OpenAI/Codex proxy sample is complete.
-   Chrome sessions for ChatGPT, Claude, and Gemini are usable; Perplexity can
-   query anonymously but presents a login layer; Copilot is blocked on sign-in.
-   One direct ChatGPT prompt was checked and did not mention Arcade Skill, but
-   the complete `25/25` direct export is still pending. The scheduler now emits
-   `SoM PENDING` until all 25 rows are marked `observed_direct` with answers.
+1. **SoM full second data point:** direct browser observations are complete for
+   ChatGPT, Perplexity, Gemini, and signed-in Copilot (`20/25`). Claude's five
+   answers are excluded because the local Arcade skill contaminated both normal
+   and incognito sessions. Finish them only in a clean Claude profile or after
+   temporarily disabling the skill, then restore the skill. The scheduler
+   correctly remains `SoM PENDING` until all 25 rows are clean
+   `observed_direct` answers.
 2. **One-click rollback callback:** notification messages, rollback workflow,
    and the deployed Worker shell exist. A dedicated Telegram bot, random webhook
    secret, and repo-scoped GitHub Actions token are still required before
    registering the webhook and enabling buttons. Do not reuse the Hermes polling
    bot webhook or a broad `gh` token.
-3. **One-week proof:** LaunchAgents are active and kept awake. The acceptance
-   window restarted after the last repaired full-chain pass at
-   `2026-07-16T05:15:10Z`; earlier failed discovery runs remain in the ledger
-   and are intentionally not erased. Only
+3. **One-week proof:** LaunchAgents are active and kept awake. The authoritative
+   ledger was recreated after the Mac restart at
+   `2026-07-16T08:28:46Z`. A later SoM notification timeout at
+   `2026-07-16T21:40:55Z` is retained as a real failure. The uninterrupted
+   acceptance window now begins at the successful retry completed at
+   `2026-07-16T21:44:28Z`. Only
    `tier_a_audit.py --days 7 --require-pass` can close this item after seven
    real days.
 4. **Stripe checkout:** still pending; support route is live, but no
@@ -111,8 +121,9 @@ deployed in `cd875b4` plus the exact-artifact deploy fix in `c0861a4`:
 - `docs/local-llm-policy.md` (modified)
 
 Completed checks: Python compile, schema load, one bounded proxy collection,
-25-row validation, atomic-write/concurrency tests, SoM scoring, Tier A smoke,
-authenticated local-LLM growth smoke, LaunchAgent reload, and Telegram delivery.
+25-row validation, atomic-write/concurrency tests, direct SoM scoring with
+contamination exclusion, Tier A smoke, authenticated local-LLM growth smoke,
+LaunchAgent retry, Telegram delivery, and desktop/mobile Playwright regression.
 Scheduled cloud collection is explicitly off (`ARCADE_SOM_CODEX_ENABLED=0`).
 Playwright passed locally and in GitHub Actions. Cloudflare production passed
 strict health verification at manifest `2026.07.16-1308`.
