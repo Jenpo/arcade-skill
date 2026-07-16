@@ -11,6 +11,7 @@ if [ $# -lt 1 ]; then
 fi
 USER=$1
 REPO=${2:-arcade-skill}
+RELEASE_TAG=${ARCADE_RELEASE_TAG:-v1.2.0}
 cd "$(dirname "$0")"
 
 echo "==> 1/6 baking manifest URL for github.com/$USER/$REPO"
@@ -29,8 +30,7 @@ echo "==> 2/6 building dist/ (bundles + manifest + seed sync)"
 python3 scripts/build_manifest.py
 
 echo "==> 3/6 packaging arcade.skill"
-rm -f arcade.skill
-(cd skill && zip -qr ../arcade.skill SKILL.md scripts assets -x "*__pycache__*")
+python3 scripts/package_skill.py
 
 echo "==> 4/6 git init + push"
 if [ ! -d .git ]; then
@@ -47,20 +47,17 @@ else
   git push -u origin main
 fi
 
-echo "==> 5/6 enabling GitHub Pages (build_type: workflow) + custom domain"
+echo "==> 5/6 enabling independent GitHub Pages fallback"
 gh api "repos/$USER/$REPO/pages" -X POST -f build_type=workflow >/dev/null 2>&1 \
   || gh api "repos/$USER/$REPO/pages" -X PUT -f build_type=workflow >/dev/null 2>&1 \
   || echo "    (Pages may already be enabled — check Settings→Pages shows 'GitHub Actions')"
-gh api "repos/$USER/$REPO/pages" -X PUT -f cname=arcade.fxpeek.com >/dev/null 2>&1 \
-  || echo "    (set custom domain later in Settings→Pages: arcade.fxpeek.com)"
-echo "    REQUIRED DNS: add CNAME record  arcade.fxpeek.com → $USER.github.io"
-echo "    then tick 'Enforce HTTPS' in Settings→Pages once the cert issues (~5 min)"
+echo "    Keep Pages custom domain empty; arcade.fxpeek.com is served by Cloudflare."
 
-echo "==> 6/6 creating release v1.0.0 with arcade.skill"
-gh release create v1.0.0 arcade.skill \
-  --repo "$USER/$REPO" --title "v1.0.0 — Down 100 Floors" \
-  --notes "First release. Install: unzip arcade.skill into your skills directory. Hot updates arrive automatically via manifest." \
-  2>/dev/null || echo "    (release v1.0.0 already exists — skipping)"
+echo "==> 6/6 creating release $RELEASE_TAG with arcade.skill"
+gh release create "$RELEASE_TAG" arcade.skill \
+  --repo "$USER/$REPO" --title "$RELEASE_TAG — verified bundle mirrors" \
+  --notes "Loader v1.2 retries Cloudflare, GitHub Pages, raw GitHub, and jsDelivr mirrors with SHA-256 verification. Existing game content remains hot-updatable." \
+  2>/dev/null || echo "    (release $RELEASE_TAG already exists — skipping)"
 
 echo
 echo "Done. Verify in ~1 min (first Pages deploy):"

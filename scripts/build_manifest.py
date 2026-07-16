@@ -14,6 +14,12 @@ DOCS = ROOT / "docs"
 
 # ---- release registry: bump a version here to ship a new build ----
 BASE_URL = "https://arcade.fxpeek.com"       # owned domain; production runs on Cloudflare Pages
+BUNDLE_BASE_URLS = [
+    BASE_URL,
+    "https://jenpo.github.io/arcade-skill",
+    "https://raw.githubusercontent.com/Jenpo/arcade-skill/main/dist",
+    "https://cdn.jsdelivr.net/gh/Jenpo/arcade-skill@main/dist",
+]
 SIGNING_KEY_B64 = os.environ.get("ARCADE_MANIFEST_SIGNING_KEY", "")
 STRIPE_SUPPORT_URL = os.environ.get(
     "ARCADE_STRIPE_SUPPORT_URL", f"{BASE_URL}/support/")
@@ -160,9 +166,13 @@ def main():
         dst = BUNDLES / name
         shutil.copy2(src, dst)
         digest = sha256_file(dst)
+        bundle_path = f"bundles/{name}"
         games.append({
             "id": gid, "title": meta["title"], "version": meta["version"],
-            "entry": f"{BASE_URL}/bundles/{name}", "sha256": digest,
+            # Keep entry for installed v1.1 loaders; v1.2+ tries every mirror.
+            "entry": f"{BASE_URL}/{bundle_path}",
+            "entries": [f"{base}/{bundle_path}" for base in BUNDLE_BASE_URLS],
+            "sha256": digest,
             "size_kb": round(dst.stat().st_size / 1024, 1),
             "tier": meta["tier"], "min_loader_version": "1.0.0",
         })

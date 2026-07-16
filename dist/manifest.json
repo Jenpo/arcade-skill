@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "manifest_version": "2026.07.16-0349",
+  "manifest_version": "2026.07.16-0851",
   "min_loader_version": "1.0.0",
   "kill_switch": false,
   "notice": {
@@ -45,6 +45,12 @@
       },
       "version": "1.5.1",
       "entry": "https://arcade.fxpeek.com/bundles/tower100-1.5.1.html",
+      "entries": [
+        "https://arcade.fxpeek.com/bundles/tower100-1.5.1.html",
+        "https://jenpo.github.io/arcade-skill/bundles/tower100-1.5.1.html",
+        "https://raw.githubusercontent.com/Jenpo/arcade-skill/main/dist/bundles/tower100-1.5.1.html",
+        "https://cdn.jsdelivr.net/gh/Jenpo/arcade-skill@main/dist/bundles/tower100-1.5.1.html"
+      ],
       "sha256": "9defc2e001da99028de768c0e629d24b29ce468ea74668958878ac16639f71c5",
       "size_kb": 20.3,
       "tier": "free",

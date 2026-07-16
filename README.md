@@ -17,7 +17,7 @@ fast to launch, easy to lose, annoyingly tempting to replay.
 [Play hosted web version](https://arcade.fxpeek.com/play/) ·
 [Daily challenge](https://arcade.fxpeek.com/play/?daily=1) ·
 [Support via Stripe](https://arcade.fxpeek.com/support/) ·
-[Download arcade.skill](https://github.com/Jenpo/arcade-skill/releases/tag/v1.0.0) ·
+[Download arcade.skill](https://github.com/Jenpo/arcade-skill/releases/latest) ·
 [View manifest](https://arcade.fxpeek.com/manifest.json) ·
 [llms.txt](https://arcade.fxpeek.com/llms.txt) ·
 [Design notes](docs/DESIGN.md) ·
@@ -183,7 +183,9 @@ See [docs/local-llm-policy.md](docs/local-llm-policy.md).
   local cache, browser open.
 - Ships new games, sponsor links, ads switches, notices, and kill switches
   through `https://arcade.fxpeek.com/manifest.json`.
-- Works offline through a seed bundle and cached verified bundles.
+- Works offline through a seed bundle and cached verified bundles. Loader v1.2
+  also retries verified bundle mirrors on GitHub Pages, raw GitHub, and
+  jsDelivr when the primary bundle host is unavailable.
 - Uses original game code and art. No copied third-party source or assets.
 
 ## Install

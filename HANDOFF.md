@@ -53,8 +53,9 @@ project: arcade-skill
 - GitHub Pages must not have `arcade.fxpeek.com` configured as a custom domain;
   otherwise its fallback URL redirects back to production and ceases to be an
   independent manifest source. `dist/CNAME` is deliberately absent. This is
-  not yet a complete asset mirror: an uncached bundle entry still points to the
-  primary domain, while cached/seed bundles remain playable offline.
+  Loader v1.2 adds verified bundle mirrors across GitHub Pages, raw GitHub, and
+  jsDelivr. Older v1.1 installations keep the primary `entry` compatibility
+  path and still require reinstalling the skill to gain mirror retries.
 - Telegram, local LLM, X browser session, and Cloudflare credentials stay on
   the Mac. They are not copied into GitHub.
 - Tier A owned surfaces can run unattended only after deterministic gates.

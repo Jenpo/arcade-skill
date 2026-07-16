@@ -24,7 +24,7 @@ MANIFEST_URLS = [
     "https://raw.githubusercontent.com/Jenpo/arcade-skill/main/dist/manifest.json",
     "https://cdn.jsdelivr.net/gh/Jenpo/arcade-skill@main/dist/manifest.json",
 ]
-LOADER_VERSION = "1.1.0"
+LOADER_VERSION = "1.2.0"
 CACHE = Path(os.environ.get("ARCADE_CACHE_DIR", Path.home() / ".arcade-skill"))
 SKILL_DIR = Path(__file__).resolve().parent.parent          # skill/
 SEED_BUNDLES = SKILL_DIR / "assets"                          # offline fallback
@@ -73,10 +73,18 @@ def validate_entry_url(entry: str) -> str:
     parsed = urllib.parse.urlparse(entry)
     host = parsed.hostname or ""
     if parsed.scheme != "https":
-        raise SystemExit("[arcade] bundle must be https")
+        raise ValueError("bundle must be https")
     if host not in ALLOWED_BUNDLE_HOSTS:
-        raise SystemExit(f"[arcade] bundle host '{host}' not in allowlist — refusing download")
+        raise ValueError(f"bundle host '{host}' not in allowlist")
     return entry
+
+
+def entry_urls(game: dict) -> list[str]:
+    configured = game.get("entries")
+    values = configured if isinstance(configured, list) else []
+    if game.get("entry") and game["entry"] not in values:
+        values = [game["entry"], *values]
+    return list(dict.fromkeys(value for value in values if isinstance(value, str) and value))
 
 
 def verify_manifest_sig(data: bytes, sig_b64: str) -> bool:
@@ -141,19 +149,25 @@ def ensure_bundle(game: dict, online: bool) -> Path:
         shutil.copy2(game["_seed"], local)
         return local
     if online:
-        tmp = local.with_suffix(".tmp")
-        try:
-            validate_entry_url(game["entry"])
-            log(f"downloading {name} ...")
-            tmp.write_bytes(fetch(game["entry"], timeout=15))
-            if sha256_file(tmp) == game["sha256"]:
-                tmp.replace(local)                          # atomic swap
-                return local
-            log("hash mismatch — discarding download")
-            tmp.unlink(missing_ok=True)
-        except Exception as e:
-            log(f"download failed: {e.__class__.__name__}")
-            tmp.unlink(missing_ok=True)
+        tmp = local.with_name(
+            f".{local.name}.{os.getpid()}.{threading.get_ident()}.tmp")
+        candidates = entry_urls(game)
+        for entry in candidates:
+            try:
+                validate_entry_url(entry)
+                host = urllib.parse.urlparse(entry).hostname or "unknown"
+                log(f"downloading {name} from {host} ...")
+                tmp.write_bytes(fetch(entry, timeout=15))
+                if sha256_file(tmp) == game["sha256"]:
+                    tmp.replace(local)                      # atomic swap
+                    return local
+                log(f"hash mismatch from {host} — trying next mirror")
+            except Exception as e:
+                log(f"download failed: {e.__class__.__name__}")
+            finally:
+                tmp.unlink(missing_ok=True)
+        if not candidates:
+            log("manifest has no usable bundle entry")
     # fall back to newest cached version of the same game
     prev = sorted(bundles.glob(f"{game['id']}-*.html"), key=lambda p: p.stat().st_mtime)
     if prev:

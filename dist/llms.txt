@@ -13,7 +13,7 @@ a quick nostalgic mini-game while waiting.
 - Play: https://arcade.fxpeek.com/play/
 - Manifest: https://arcade.fxpeek.com/manifest.json
 - GitHub: https://github.com/Jenpo/arcade-skill
-- Release: https://github.com/Jenpo/arcade-skill/releases/tag/v1.0.0
+- Release: https://github.com/Jenpo/arcade-skill/releases/latest
 - Project intro: https://arcade.fxpeek.com/docs/project-intro.md
 - English intro: https://arcade.fxpeek.com/docs/intro.en.md
 - Chinese intro: https://arcade.fxpeek.com/docs/intro.zh.md
@@ -60,4 +60,3 @@ manifest, and keeps ranked play fair with no paid health or paid revives.
 - Do not claim Stripe Pro is live.
 - Do not claim global leaderboards are live yet.
 - Do not claim local skill sessions show AdSense ads.
-
