@@ -163,9 +163,16 @@ Actions secrets so the same bot owns both messages and callbacks. Install the
 jobs with:
 
 ```bash
+python3 scripts/install_artifact_layout.py
 python3 scripts/install_tier_a_launchd.py --install
 python3 scripts/growth/tier_a_audit.py --days 7
 ```
+
+The artifact installer keeps source code on the Mac and links generated SoM
+inputs, reports, drafts, queues, state, radar results, and smoke output into the
+current standard run under `/Volumes/S/Workplace/Codex-Workdir/arcade-skill/`.
+It fails closed when the S volume is unavailable. Set `ARCADE_ARTIFACT_ROOT`
+only when rotating the standard run directory.
 
 The installer keeps the AC-powered scheduler awake and records append-only
 task evidence under `~/Library/Logs/arcade-skill/`. A seven-day PASS requires

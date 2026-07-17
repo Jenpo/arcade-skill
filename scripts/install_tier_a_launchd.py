@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 LAUNCH_AGENTS = Path.home() / "Library/LaunchAgents"
 LOG_DIR = Path.home() / "Library/Logs/arcade-skill"
 RUNNER = ROOT / "scripts/growth/tier_a_runner.py"
+ARTIFACT_LAYOUT_INSTALLER = ROOT / "scripts/install_artifact_layout.py"
 KEEP_AWAKE_LABEL = "com.fxpeek.arcade.tier-a.keepawake"
 
 JOBS = {
@@ -53,6 +54,7 @@ def main():
     ap = argparse.ArgumentParser(description="Install Arcade Tier A LaunchAgents")
     ap.add_argument("--install", action="store_true")
     args = ap.parse_args()
+    subprocess.run([sys.executable, str(ARTIFACT_LAYOUT_INSTALLER)], check=True)
     LAUNCH_AGENTS.mkdir(parents=True, exist_ok=True)
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     uid = os.getuid()
