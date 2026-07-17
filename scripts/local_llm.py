@@ -8,7 +8,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-DEFAULT_BASE_URL = os.environ.get("ARCADE_LOCAL_LLM_BASE_URL", "http://192.168.31.68:4000/v1")
+DEFAULT_BASE_URL = os.environ.get("ARCADE_LOCAL_LLM_BASE_URL", "http://127.0.0.1:4000/v1")
 DEFAULT_MODEL = os.environ.get("ARCADE_LOCAL_LLM_MODEL", "s8_local_fast_v1")
 DEFAULT_REVIEW_MODEL = os.environ.get("ARCADE_LOCAL_LLM_REVIEW_MODEL", "s8_local_main_v1")
 KEY_ENV_NAMES = ["ARCADE_LOCAL_LLM_API_KEY", "LITELLM_MASTER_KEY", "S8_LLM_ROUTER_KEY"]
