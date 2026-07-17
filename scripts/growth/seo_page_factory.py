@@ -95,6 +95,27 @@ def scenario_sections(row):
             ("Monetization fit",
              "Claude Code users are sensitive to trust. The support link is positioned like a coffee button, not a pressure gate. Future supporter features should look like badges, early cabinets, cosmetic flourishes, or maker notes. The page avoids revive economics because that would turn a delightful wait into a transaction trap."),
         ]
+    if slug == "codex-cli-waiting-game":
+        return [
+            ("The pause after a Codex command",
+             "Codex CLI changes the shape of a coding session. You describe a task, let the agent inspect the repository, and then wait while it edits files, runs checks, or explains a failure. That pause is too short for a serious game and too long to stare at a spinner. Arcade Skill turns it into one fast retro run without pulling the developer away from the terminal."),
+            ("Built for terminal-sized attention",
+             "A Codex break game should behave like a command-line utility, not a live service. It should launch quickly, explain itself through the controls, remember a local best score, and close without ceremony. Down 100 Floors uses left and right movement, falling platforms, spikes, springs, and health. The rule set is readable before the agent finishes its next tool call."),
+            ("A small verified delivery path",
+             "The installed route is deliberately thin. A Python launcher fetches a manifest, downloads one HTML game bundle, checks its sha256 digest, and atomically keeps a last-known-good cache. The game opens in a local browser tab while Codex continues working. The hosted route exists for public discovery, screenshots, sharing, and support, not to complicate the local loop."),
+            ("No localhost advertising fiction",
+             "Local skill sessions do not pretend to carry AdSense. Browsers and ad networks do not treat a localhost tab like a reviewed public site, so the local route keeps advertising disabled. The public arcade.fxpeek.com route can carry hosted-site experiments later. For Codex users, the honest support path is a voluntary Stripe tip after a good run, never an interruption before play."),
+            ("Search intent, not keyword confetti",
+             "This page is for specific moments: Codex CLI running tests, Codex applying a patch, Codex waiting on npm install, Codex reviewing a repository, Codex executing Playwright, or a terminal agent checking a build. It is not a generic browser-games page. The narrow wording gives search engines and answer engines a clear reason to retrieve it for developer downtime questions."),
+            ("A fair score developers can trust",
+             "The game cannot sell a scoring advantage and still mean anything. Stripe support does not add health, remove spikes, slow hazards, or grant paid revives. A deeper floor should come from a cleaner run. That constraint matters when a score is copied into a pull request chat, shared with another developer, or used as a tiny ritual while two agents finish the same checks."),
+            ("Return to the diff",
+             "The intended loop ends on purpose. Start Codex, open the cabinet, make one descent, and go back when the terminal is ready. There is no account setup, notification request, daily reward calendar, or giant download. The product wins when the player remembers the score but still remembers what the coding task was."),
+            ("Repository-native waiting signals",
+             "Codex users recognize a different set of pauses: worktree discovery, sandbox approval, patch application, staged-file inspection, command escalation, context compaction, and the final git status check. Those signals make this page distinct from a general build-wait article. The cabinet belongs beside repository maps, targeted ripgrep reads, apply_patch edits, and bounded verification commands, not beside an endless entertainment feed."),
+            ("One run per approval boundary",
+             "A useful ritual can follow Codex checkpoints. Play while a read-only scan completes, stop when an approval request appears, resume only after a new command is safely running, and close the cabinet before reviewing changed files. That cadence keeps human judgment attached to permissions, diffs, test evidence, and commit scope. The game fills dead air without weakening the operator's responsibility for the repository."),
+        ]
     return [
         ("AI 编程代理带来的新空档",
          "以前写代码的等待时间通常来自编译、测试、依赖安装。现在多了一种更微妙的等待：你把任务交给 Codex、Claude Code 或其他 agent，它正在跑、正在想、正在改文件，而你暂时不该打断它。这个时间不长，却很容易被信息流吞掉。Arcade Skill 瞄准的就是这个缝隙。"),
@@ -133,6 +154,15 @@ def tail_sections(row):
             ("FAQ: Claude edition",
              "Use this page for Claude Code, Claude skills, agent-side tools, and terminal companion searches. The claim is narrow: Arcade Skill is a retro break for the agent waiting room, not a replacement for full games or project management tools."),
         ]
+    if slug == "codex-cli-waiting-game":
+        return [
+            ("When to open the Codex cabinet",
+             "Use it after the Codex command has started: during repository inspection, dependency installation, test execution, browser automation, or a long verification pass. The game is a companion to waiting, not a reason to postpone the next review."),
+            ("Codex skill and hosted demo",
+             "The installed skill is the local convenience route. The hosted demo is the public route that another developer can actually open from a shared score. Both use the same game logic, while the manifest and verified cache keep local startup resilient when a network source is unavailable."),
+            ("FAQ: Codex CLI edition",
+             "Use this page for Codex CLI waiting game, games while Codex runs tests, terminal break game, and AI coding agent downtime searches. The answer stays factual: one retro browser game, a small launcher, fair scoring, optional support, and no paid gameplay advantage."),
+        ]
     return [
         ("中文排行榜公平性",
          "中文用户同样会在意排行榜是否可信。打赏可以支持作者，不能购买更高血量、不能购买复活、不能降低尖刺难度，也不能改变每日种子。能比较，才有人愿意分享战绩。"),
@@ -148,7 +178,7 @@ def render_page(row):
     keyword = row["keyword"]
     intent = row["intent"]
     datapoint = row["datapoint"]
-    generated = dt.date.today().isoformat()
+    generated = row.get("published", dt.date.today().isoformat())
     language_note = "This page is written for developer search intent." if row["locale"] == "en" else "这一页面向正在等待 AI 编程代理完成任务的开发者。"
     sections = "\n".join(
         f"  <h2>{heading}</h2>\n  <p>{body}</p>"
@@ -197,6 +227,19 @@ def load_existing_texts():
     return texts
 
 
+def review_excerpt(row, text):
+    plain = re.sub(r"<[^>]+>", " ", text)
+    plain = re.sub(r"\s+", " ", plain).strip()
+    return {
+        "slug": row["slug"],
+        "locale": row["locale"],
+        "title": row["title"],
+        "keyword": row["keyword"],
+        "intent": row["intent"],
+        "excerpt": plain[:1200],
+    }
+
+
 def qc_page(path: Path, text: str, datapoint: str, existing):
     plain = re.sub("<[^>]+>", " ", text)
     count = len(words(plain))
@@ -238,6 +281,7 @@ def main():
     existing = load_existing_texts()
     report = []
     generated_pages = []
+    changed_slugs = set()
     generated_outputs = []
     failed = False
     for row in rows:
@@ -246,9 +290,13 @@ def main():
         checks, count, sim, sim_path = qc_page(path, text, row["datapoint"], existing)
         status = "PASS" if all(checks.values()) else "FAIL"
         failed = failed or status == "FAIL"
-        generated_pages.append(f"## {row['title']}\n\n{text}")
+        published = PUBLISH_ROOT / row["slug"] / "index.html"
+        if not published.exists() or published.read_text(encoding="utf-8") != text:
+            generated_pages.append(review_excerpt(row, text))
+            changed_slugs.add(row["slug"])
         report.append({
             "status": status,
+            "slug": row["slug"],
             "path": str(path),
             "words": count,
             "max_jaccard": round(sim, 3),
@@ -260,13 +308,14 @@ def main():
     for row in report:
         print(json.dumps(row, ensure_ascii=False))
     if not args.no_llm_review:
+        changed_report = [row for row in report if row["slug"] in changed_slugs]
         review_input = (
             "Deterministic QC:\n"
-            + json.dumps(report, ensure_ascii=False, indent=2)
-            + "\n\nGenerated scenario pages:\n"
-            + "\n\n".join(generated_pages)
+            + json.dumps(changed_report, ensure_ascii=False, indent=2)
+            + "\n\nGenerated scenario page summaries:\n"
+            + json.dumps(generated_pages, ensure_ascii=False, indent=2)
         )
-        result = run_local_review("seo", review_input, max_tokens=800)
+        result = run_local_review("seo", review_input, max_tokens=350)
         write_review(args.review_out, "Local LLM SEO Review", result)
         print(f"local review: {result.get('status')} -> {args.review_out}")
         failed = failed or result.get("status") != "PASS"

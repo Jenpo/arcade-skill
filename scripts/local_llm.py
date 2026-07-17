@@ -77,7 +77,6 @@ def chat(args, prompt):
         ],
         "max_tokens": args.max_tokens,
         "temperature": args.temperature,
-        "reasoning_effort": False,
     }
     try:
         data = post_json(args.base_url.rstrip("/") + "/chat/completions", payload, key, args.timeout)

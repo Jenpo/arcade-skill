@@ -1,6 +1,7 @@
 [
   {
     "slug": "games-while-ai-agent-runs-tests",
+    "published": "2026-07-16",
     "locale": "en",
     "title": "Tiny Browser Games While Your AI Agent Runs Tests",
     "keyword": "games while AI agent runs tests",
@@ -9,6 +10,7 @@
   },
   {
     "slug": "claude-code-break-game",
+    "published": "2026-07-16",
     "locale": "en",
     "title": "A Retro Break Game For Claude Code Wait Time",
     "keyword": "Claude Code break game",
@@ -16,7 +18,17 @@
     "intent": "Users who want a harmless local arcade break instead of doom-scrolling during agent waits."
   },
   {
+    "slug": "codex-cli-waiting-game",
+    "published": "2026-07-17",
+    "locale": "en",
+    "title": "A Tiny Retro Game For Codex CLI Wait Time",
+    "keyword": "Codex CLI waiting game",
+    "datapoint": "Arcade Skill publishes a sha256-verified single HTML game bundle and opens it through a small local Python launcher.",
+    "intent": "Codex CLI users waiting for edits, dependency installs, test runs, reviews, and long terminal commands."
+  },
+  {
     "slug": "ai-agent-waiting-game-zh",
+    "published": "2026-07-16",
     "locale": "zh",
     "title": "AI Agent 跑测试时玩的复古小游戏",
     "keyword": "AI agent 跑测试 小游戏",

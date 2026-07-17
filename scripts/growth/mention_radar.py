@@ -143,7 +143,12 @@ def draft_reply(item):
 def write_report(items, out: Path):
     cfg = read_json(KEYWORDS)
     scored = []
+    seen = set()
     for item in items:
+        key = item["url"].rstrip("/").lower() or f"{item['source']}:{item['title'].lower()}"
+        if key in seen:
+            continue
+        seen.add(key)
         label, score, reason = score_item(item, cfg)
         scored.append({**item, "label": label, "score": score, "reason": reason})
     scored.sort(key=lambda x: (x["label"] == "IGNORE", -x["score"], x["source"]))
@@ -187,6 +192,25 @@ def write_report(items, out: Path):
     return scored
 
 
+def review_payload(scored):
+    candidates = [row for row in scored if row["label"] != "IGNORE"][:12]
+    return json.dumps(
+        [
+            {
+                "label": row["label"],
+                "score": row["score"],
+                "source": row["source"],
+                "title": row["title"][:240],
+                "url": row["url"],
+                "reason": row["reason"],
+            }
+            for row in candidates
+        ],
+        ensure_ascii=False,
+        indent=2,
+    )
+
+
 def main():
     global SSL_CONTEXT
     ap = argparse.ArgumentParser(description="Arcade Skill mention radar")
@@ -216,11 +240,11 @@ def main():
     items = load_items(args)
     if not items:
         raise SystemExit("no radar items found")
-    write_report(items, args.out)
+    scored = write_report(items, args.out)
     if not args.no_llm_review:
         result = run_local_review(
             "radar",
-            args.out.read_text(encoding="utf-8"),
+            review_payload(scored),
             max_tokens=550,
         )
         append_review(args.out, "Local LLM Opportunity Review", result)

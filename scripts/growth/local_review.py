@@ -18,6 +18,8 @@ def run_local_review(task, text, max_tokens=700, review_model=False, timeout=180
         "--json",
         "--max-tokens",
         str(max_tokens),
+        "--timeout",
+        str(max(1, timeout - 15)),
     ]
     if review_model:
         cmd.append("--review-model")
