@@ -59,10 +59,14 @@ project: arcade-skill
 - Two first-run defects were caught and fixed: Wrangler ANSI warnings no longer
   corrupt D1 JSON parsing, and unattended Git pushes now use the verified SSH
   remote. SEO publishing now fails closed when local LLM review is unavailable.
-- The rollback callback shell is deployed at
+- The hardened rollback callback Worker version
+  `ae588937-fa83-4f32-858e-574440dc4d3f` is deployed at
   `https://arcade-live-check.fxpeek.workers.dev`: `/health` returns 200 and an
-  unauthenticated webhook request returns 401. No Telegram webhook is registered
-  and no rollback credential is installed yet.
+  unauthenticated webhook request returns 401. Its tested `site` action resolves
+  a unique successful Cloudflare production deployment, rolls back the primary,
+  and queues the GitHub Pages fallback. Chat/user authorization and compact
+  callback tests pass. No Telegram webhook is registered and no rollback secret
+  is installed yet.
 
 ## Ownership Boundaries
 
@@ -75,8 +79,10 @@ project: arcade-skill
   v1.2 adds verified bundle mirrors across GitHub Pages, raw GitHub, and
   jsDelivr. Older v1.1 installations keep the primary `entry` compatibility
   path and still require reinstalling the skill to gain mirror retries.
-- Telegram, local LLM, X browser session, and Cloudflare credentials stay on
-  the Mac. They are not copied into GitHub.
+- Local LLM, X browser, and Cloudflare deployment credentials stay on the Mac.
+  The dedicated live-check bot token is limited to the Mac mode-`0600` env,
+  Worker secrets, and GitHub Actions secrets so one bot owns messages and
+  callbacks. The Pages Write token exists only as a Worker secret.
 - Tier A owned surfaces can run unattended only after deterministic gates.
 - Tier B Reddit/HN replies and external issues/PRs remain one-click approved.
 
@@ -89,11 +95,13 @@ project: arcade-skill
    temporarily disabling the skill, then restore the skill. The scheduler
    correctly remains `SoM PENDING` until all 25 rows are clean
    `observed_direct` answers.
-2. **One-click rollback callback:** notification messages, rollback workflow,
-   and the deployed Worker shell exist. A dedicated Telegram bot, random webhook
-   secret, and repo-scoped GitHub Actions token are still required before
-   registering the webhook and enabling buttons. Do not reuse the Hermes polling
-   bot webhook or a broad `gh` token.
+2. **One-click rollback callback:** dual-primary/fallback code, target parsing,
+   authorization gates, provisioner, and hardened Worker are deployed. Worker
+   secret inventory is currently `0/7` and GitHub notification secret inventory
+   is `0/2`. Create a dedicated Telegram bot, a repository-only GitHub token with
+   Actions write, and a Cloudflare account token with Pages Write, then run
+   `python3 scripts/provision_live_check.py configure`. Do not reuse a Hermes
+   polling bot, broad `gh` token, or the previously exposed Cloudflare key.
 3. **One-week proof:** LaunchAgents are active and kept awake. The authoritative
    ledger was recreated after the Mac restart at
    `2026-07-16T08:28:46Z`. A later SoM notification timeout at

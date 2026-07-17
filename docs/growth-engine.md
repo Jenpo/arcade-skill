@@ -40,6 +40,15 @@ minutes. It also keeps the AC-powered Mac mini awake with a dedicated
 `caffeinate -s` LaunchAgent. Every task writes an append-only local audit row;
 failures emit a Telegram alert without including exception text or secrets.
 
+Rollback buttons use a dedicated Arcade Telegram bot, not a Hermes polling bot.
+For site deploys, one compact callback rolls back both the Cloudflare Pages
+production deployment and the GitHub Pages fallback. The callback Worker checks
+the webhook secret, source chat, allowed user, target syntax, fixed repository,
+and fixed Cloudflare project before acting; a successful click removes the
+button. Configure credentials only through
+`scripts/provision_live_check.py configure`, which uses hidden input and local
+mode-`0600` storage.
+
 Verify a full unattended window only after seven real days have elapsed:
 
 ```bash

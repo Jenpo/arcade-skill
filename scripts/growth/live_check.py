@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import re
 import subprocess
 
 
@@ -17,7 +18,17 @@ def send_message(text, rollback_kind="", rollback_ref=""):
         return {"status": "LIVE_CHECK_PENDING", "reason": "Telegram bot token or chat id is missing"}
     payload = {"chat_id": chat_id, "text": text, "disable_web_page_preview": True}
     if rollback_kind and rollback_ref:
-        callback = f"rollback:{rollback_kind}:{rollback_ref}"[:64]
+        patterns = {
+            "site": r"[a-f0-9]{8}:[a-f0-9]{7,40}",
+            "github": r"[a-f0-9]{7,40}",
+            "x": r"[A-Za-z0-9._-]{1,40}",
+            "jike": r"[A-Za-z0-9._-]{1,40}",
+        }
+        if rollback_kind not in patterns or not re.fullmatch(patterns[rollback_kind], rollback_ref):
+            return {"status": "LIVE_CHECK_INVALID", "reason": "invalid rollback reference"}
+        callback = f"rollback:{rollback_kind}:{rollback_ref}"
+        if len(callback.encode("utf-8")) > 64:
+            return {"status": "LIVE_CHECK_INVALID", "reason": "rollback callback exceeds Telegram limit"}
         payload["reply_markup"] = {
             "inline_keyboard": [[{"text": "Rollback", "callback_data": callback}]]
         }
@@ -48,7 +59,7 @@ def send_message(text, rollback_kind="", rollback_ref=""):
 def main():
     ap = argparse.ArgumentParser(description="Arcade live-check Telegram notifier")
     ap.add_argument("--message", required=True)
-    ap.add_argument("--rollback-kind", choices=["site", "x", "jike"], default="")
+    ap.add_argument("--rollback-kind", choices=["site", "github", "x", "jike"], default="")
     ap.add_argument("--rollback-ref", default="")
     ap.add_argument("--require-delivery", action="store_true")
     args = ap.parse_args()

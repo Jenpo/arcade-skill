@@ -35,6 +35,10 @@ def payload(task, schedule):
             "PATH": os.environ.get("PATH", "/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin"),
             "NO_PROXY": "127.0.0.1,localhost,192.168.0.0/16,192.168.2.1,192.168.31.0/24",
             "ARCADE_SOM_CODEX_ENABLED": os.environ.get("ARCADE_SOM_CODEX_ENABLED", "0"),
+            "ARCADE_LIVE_CHECK_ENV": os.environ.get(
+                "ARCADE_LIVE_CHECK_ENV",
+                str(Path.home() / "Library/Application Support/ArcadeSkill/live-check.env"),
+            ),
             "ARCADE_TIER_A_TRIGGER": "launchd",
         },
     }

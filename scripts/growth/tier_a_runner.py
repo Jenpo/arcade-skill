@@ -14,6 +14,10 @@ from pathlib import Path
 from live_check import send_message
 
 ROOT = Path(__file__).resolve().parents[2]
+LIVE_CHECK_ENV = Path(os.environ.get(
+    "ARCADE_LIVE_CHECK_ENV",
+    Path.home() / "Library/Application Support/ArcadeSkill/live-check.env",
+))
 HERMES_ENV = Path(os.environ.get("ARCADE_HERMES_ENV", Path.home() / ".hermes/.env"))
 ROUTER_SH = Path(os.environ.get(
     "ARCADE_LOCAL_LLM_KEY_SOURCE",
@@ -37,6 +41,7 @@ def load_env_file(path):
 
 
 def load_local_secrets():
+    load_env_file(LIVE_CHECK_ENV)
     load_env_file(HERMES_ENV)
     token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
     chat = os.environ.get("TELEGRAM_HOME_CHANNEL", "")
@@ -91,8 +96,27 @@ def notify(message, rollback_kind="", rollback_ref=""):
 
 
 def task_health():
-    run([sys.executable, "scripts/production_health.py", "--insecure", "--attempts", "3", "--retry-delay", "10"])
-    notify("Arcade Tier A health PASS\nhttps://arcade.fxpeek.com")
+    result = subprocess.run(
+        [sys.executable, "scripts/production_health.py", "--insecure", "--attempts", "3", "--retry-delay", "10"],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    if result.returncode == 0:
+        return
+
+    output = "\n".join(
+        (result.stdout + "\n" + result.stderr).strip().splitlines()[-12:]
+    )
+    message = (
+        "❌ Arcade Tier A health FAIL\n"
+        f"exit={result.returncode}\n"
+        "https://arcade.fxpeek.com"
+    )
+    if output:
+        message += f"\n\n{output}"
+    notify(message)
+    raise SystemExit(result.returncode)
 
 
 def task_seo():
@@ -100,6 +124,11 @@ def task_seo():
     if dirty:
         raise SystemExit("refusing Tier A SEO run on a dirty worktree")
     previous = capture(["git", "rev-parse", "HEAD"])
+    previous_deployment = capture([
+        sys.executable,
+        "scripts/cloudflare_pages.py",
+        "--short",
+    ])
     run([sys.executable, "scripts/growth/seo_page_factory.py", "--publish"])
     run([sys.executable, "scripts/growth/tier_a_smoke.py"])
     run([sys.executable, "scripts/build_manifest.py"])
@@ -120,7 +149,11 @@ def task_seo():
         "--retry-delay", "15",
         "--min-manifest-version", manifest,
     ])
-    notify(f"Arcade Tier A SEO deploy PASS\nmanifest {manifest}", "site", previous[:40])
+    notify(
+        f"Arcade Tier A SEO deploy PASS\nmanifest {manifest}",
+        "site",
+        f"{previous_deployment}:{previous[:7]}",
+    )
 
 
 def som_direct_coverage(source):

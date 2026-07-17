@@ -72,6 +72,6 @@ jobs:
         run: >-
           python3 scripts/growth/live_check.py
           --message "Arcade deploy PASS: manifest ${{ steps.versions.outputs.manifest }}"
-          --rollback-kind site
+          --rollback-kind github
           --rollback-ref "${{ steps.versions.outputs.previous }}"
           --require-delivery

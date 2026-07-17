@@ -22,6 +22,8 @@ def main():
     run(["python3", "scripts/growth/mention_radar.py", "--offline", "--no-llm-review", "--out", str(out / "radar.md")])
     run(["python3", "scripts/growth/seo_page_factory.py", "--dry-run", "--no-llm-review"])
     run(["python3", "scripts/growth/tier_a_smoke.py"])
+    run(["python3", "scripts/test_live_check.py"])
+    run(["node", "--test", "tests/live-check-worker.test.mjs"])
     run(["python3", "scripts/test_launcher_fallback.py"])
     run(["python3", "scripts/growth/weekly_growth_report.py", "--out", str(out / "weekly.md")])
     run(

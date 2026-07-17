@@ -146,9 +146,21 @@ or payment claims, no credential-shaped text, and only approved link hosts.
 live-check receipts with rollback callback data. Third-party community replies
 and repository submissions never enter this automatic publisher.
 
-Tier A schedules run through Mac LaunchAgents so local LLM, Telegram, X browser
-session, and Cloudflare credentials stay on the Mac mini instead of being
-copied into GitHub. Install them with:
+Live-check uses a dedicated Telegram bot. A site rollback button reverts the
+Cloudflare Pages production deployment and queues the matching GitHub Pages
+fallback rollback; callbacks are restricted to one chat and an explicit user
+allowlist. Configure it without exposing secrets:
+
+```bash
+python3 scripts/provision_live_check.py configure
+python3 scripts/provision_live_check.py check
+```
+
+Tier A schedules run through Mac LaunchAgents. Local LLM, X browser, and
+Cloudflare deployment credentials stay on the Mac mini. The dedicated bot token
+is stored only in the Mac mode-`0600` env, Cloudflare Worker secrets, and GitHub
+Actions secrets so the same bot owns both messages and callbacks. Install the
+jobs with:
 
 ```bash
 python3 scripts/install_tier_a_launchd.py --install
