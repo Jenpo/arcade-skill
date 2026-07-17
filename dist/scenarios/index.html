@@ -34,7 +34,7 @@
   .avatar:after{content:"";position:absolute;left:7px;top:11px;width:8px;height:9px;border:1px solid #fff;background:var(--coin);box-shadow:-5px 1px 0 -2px var(--coin),5px 1px 0 -2px var(--coin),-3px 10px 0 -2px var(--coin),3px 10px 0 -2px var(--coin)}
   .spike{position:absolute;right:76px;bottom:78px;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:24px solid var(--danger)}
   .meter{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}.meter span{border:1px solid #334052;border-radius:5px;padding:8px;background:#111827;color:#d1fae5;font:12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:32px}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:32px}
   .card{position:relative;display:flex;flex-direction:column;min-height:258px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px}
   .card:before{content:attr(data-key);align-self:flex-start;margin-bottom:18px;border:1px solid var(--line);border-radius:4px;background:#fff;padding:5px 9px;color:#6b7280;font:12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
   .card strong{display:block;font-size:22px;line-height:1.1;margin-bottom:12px;color:var(--ink)}.card p{color:var(--muted);margin:0 0 18px}.card a{margin-top:auto}
@@ -89,6 +89,12 @@
       <p>A retro-positioned page for the Claude Code waiting room: tiny browser
       arcade, terminal-adjacent, no heavy context switch.</p>
       <a href="/scenarios/claude-code-break-game/">Open scenario</a>
+    </article>
+    <article class="card" data-key="CODEX">
+      <strong>Codex CLI waiting game</strong>
+      <p>A small verified cabinet for edits, installs, test runs, browser checks,
+      and the quiet minute before Codex hands the terminal back.</p>
+      <a href="/scenarios/codex-cli-waiting-game/">Open scenario</a>
     </article>
     <article class="card" data-key="中文">
       <strong>AI Agent 跑测试时玩的复古小游戏</strong>
