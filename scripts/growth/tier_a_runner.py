@@ -5,6 +5,7 @@ import datetime as dt
 import fcntl
 import json
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -26,6 +27,10 @@ ROUTER_SH = Path(os.environ.get(
 AUDIT_LEDGER = Path(os.environ.get(
     "ARCADE_TIER_A_AUDIT_LEDGER",
     Path.home() / "Library/Logs/arcade-skill/tier-a-audit.jsonl",
+))
+NOTIFICATION_STATE = Path(os.environ.get(
+    "ARCADE_TIER_A_NOTIFICATION_STATE",
+    ROOT / "growth/state/tier-a-notification-signatures.json",
 ))
 
 
@@ -95,6 +100,28 @@ def notify(message, rollback_kind="", rollback_ref=""):
         raise SystemExit("Tier A live-check delivery failed")
 
 
+def record_signature(key, signature, path=NOTIFICATION_STATE):
+    state = {}
+    if path.exists():
+        try:
+            state = json.loads(path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            state = {}
+    previous = state.get(key)
+    if previous != signature:
+        state[key] = signature
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = path.with_suffix(path.suffix + ".tmp")
+        temporary.write_text(json.dumps(state, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
+        temporary.replace(path)
+    return previous is not None and previous != signature
+
+
+def report_metric(text, label):
+    match = re.search(rf"^- {re.escape(label)}: (.+)$", text, flags=re.MULTILINE)
+    return match.group(1).strip() if match else "unknown"
+
+
 def task_health():
     result = subprocess.run(
         [sys.executable, "scripts/production_health.py", "--insecure", "--attempts", "3", "--retry-delay", "10"],
@@ -123,18 +150,12 @@ def task_seo():
     dirty = capture(["git", "status", "--porcelain"])
     if dirty:
         raise SystemExit("refusing Tier A SEO run on a dirty worktree")
-    previous = capture(["git", "rev-parse", "HEAD"])
-    previous_deployment = capture([
-        sys.executable,
-        "scripts/cloudflare_pages.py",
-        "--short",
-    ])
     run([sys.executable, "scripts/growth/seo_page_factory.py", "--publish"])
     run([sys.executable, "scripts/growth/tier_a_smoke.py"])
     run([sys.executable, "scripts/build_manifest.py"])
     changed = capture(["git", "status", "--porcelain"])
     if not changed:
-        notify("Arcade Tier A SEO PASS\nNo publishable page changes this cycle.")
+        print("Arcade Tier A SEO: no publishable changes")
         return
     run(["git", "add", "docs/scenarios", "dist", "README.md"])
     run(["git", "commit", "-m", "chore: publish scheduled arcade scenarios"])
@@ -149,11 +170,7 @@ def task_seo():
         "--retry-delay", "15",
         "--min-manifest-version", manifest,
     ])
-    notify(
-        f"Arcade Tier A SEO deploy PASS\nmanifest {manifest}",
-        "site",
-        f"{previous_deployment}:{previous[:7]}",
-    )
+    print(f"Arcade Tier A SEO deploy PASS: manifest {manifest}")
 
 
 def som_direct_coverage(source):
@@ -173,19 +190,37 @@ def task_som():
         if not target.exists():
             run([sys.executable, "scripts/growth/som_codex_collector.py", "--out", str(target)])
         source = target
-    candidates = sorted((ROOT / "growth/som").glob("*.jsonl")) if (ROOT / "growth/som").exists() else []
+    candidates = (
+        sorted(
+            path for path in (ROOT / "growth/som").glob("*.jsonl")
+            if not path.name.startswith("._")
+        )
+        if (ROOT / "growth/som").exists()
+        else []
+    )
     if source is None and candidates:
         source = max(candidates, key=lambda path: path.stat().st_mtime)
     if source is None:
-        notify("Arcade Tier A SoM PENDING\nNo reviewed weekly engine-response export is available.")
+        print("Arcade Tier A SoM: no reviewed weekly engine-response export")
         return
     out = ROOT / "growth/reports" / f"som-{source.stem}.md"
     run([sys.executable, "scripts/growth/som_tracker.py", "score", "--input", str(source), "--out", str(out)])
     direct, total = som_direct_coverage(source)
-    if total != 25 or direct != 25:
-        notify(f"Arcade Tier A SoM PENDING\nDirect coverage {direct}/25\n{out.name}")
-        return
-    notify(f"Arcade Tier A SoM PASS\nDirect coverage 25/25\n{out.name}")
+    report = out.read_text(encoding="utf-8")
+    signature = {
+        "direct_coverage": f"{direct}/{total}",
+        "mention_rate": report_metric(report, "Mention rate"),
+        "citation_rate": report_metric(report, "Citation rate"),
+    }
+    if record_signature("som", signature):
+        notify(
+            "Arcade Tier A SoM changed\n"
+            f"Direct coverage {direct}/{total}\n"
+            f"Mention rate {signature['mention_rate']}\n"
+            f"Citation rate {signature['citation_rate']}"
+        )
+    else:
+        print(f"Arcade Tier A SoM unchanged: {signature}")
 
 
 def task_weekly():
@@ -193,7 +228,7 @@ def task_weekly():
     weekly = ROOT / "growth/reports/weekly-growth-latest.md"
     run([sys.executable, "scripts/growth/telemetry_report.py", "--out", str(telemetry)])
     run([sys.executable, "scripts/growth/weekly_growth_report.py", "--out", str(weekly)])
-    notify("Arcade Tier A weekly report PASS\nTelemetry and growth reports refreshed.")
+    print("Arcade Tier A weekly reports refreshed")
 
 
 def task_queue():

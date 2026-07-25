@@ -13,7 +13,7 @@ from som_codex_collector import build_rows, exclusive_lock, write_jsonl_atomic
 from som_tracker import score_row
 from telemetry_report import extract_results
 from tier_a_audit import evaluate
-from tier_a_runner import som_direct_coverage
+from tier_a_runner import record_signature, report_metric, som_direct_coverage
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -119,6 +119,17 @@ def main():
                 pass
             else:
                 raise SystemExit("collector concurrency lock did not block a duplicate run")
+
+        notification_state = tmp_path / "notification-signatures.json"
+        signature = {"direct_coverage": "20/25", "mention_rate": "1/20 (5.0%)"}
+        require(not record_signature("som", signature, notification_state), "first SoM baseline must stay silent")
+        require(not record_signature("som", signature, notification_state), "unchanged SoM must stay silent")
+        changed = {"direct_coverage": "25/25", "mention_rate": "2/25 (8.0%)"}
+        require(record_signature("som", changed, notification_state), "changed SoM must trigger a notification")
+        require(
+            report_metric("- Mention rate: 1/20 (5.0%)\n", "Mention rate") == "1/20 (5.0%)",
+            "SoM report metric parser failed",
+        )
 
         now = dt.datetime(2026, 7, 16, 12, 0, tzinfo=dt.UTC)
         audit_rows = []
